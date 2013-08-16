@@ -1,0 +1,24 @@
+TitleText: synack-5-maxconnect_
+Device: Postscript
+BoundBox: true
+Ticks: true
+NoLines: true
+Markers: true
+XUnitText: time
+YUnitText: packets
+
+"packets
+
+"acks
+
+"drops
+0.002032 0
+3.002032 0
+9.002032 0
+21.002032 0
+0.002032 0
+21.002032 0
+3.002032 0
+45.002032 0
+9.002032 0
+

@@ -1,0 +1,111 @@
+TitleText: -
+Device: Postscript
+BoundBox: true
+Ticks: true
+Markers: true
+XUnitText: time
+YUnitText: packets
+
+"packets
+move 10.669442 0
+draw 10.669442 0
+move 10.985506 1
+draw 10.985506 1
+move 11.30157 2
+draw 11.30157 2
+move 11.30237 3
+draw 11.31157 3
+move 11.527634 4
+draw 11.527634 4
+move 11.528434 5
+draw 11.537634 5
+move 11.753698 6
+draw 11.753698 6
+move 11.754498 7
+draw 11.763698 7
+move 11.755298 8
+draw 11.773698 8
+move 11.979762 9
+draw 11.979762 9
+move 29.044414 0
+draw 29.044414 0
+move 29.045214 1
+draw 29.054414 1
+move 29.046014 2
+draw 29.064414 2
+move 29.046814 3
+draw 29.074414 3
+move 29.270478 4
+draw 29.270478 4
+move 29.271278 5
+draw 29.280478 5
+move 29.290478 6
+draw 29.290478 6
+move 29.291278 7
+draw 29.300478 7
+move 29.496542 8
+draw 29.496542 8
+move 29.497342 9
+draw 29.506542 9
+move 49.266168 0
+draw 49.266168 0
+move 49.266968 1
+draw 49.276168 1
+move 49.267768 2
+draw 49.286168 2
+move 49.268568 3
+draw 49.296168 3
+move 49.269368 4
+draw 49.306168 4
+move 49.270168 5
+draw 49.316168 5
+move 49.492232 6
+draw 49.492232 6
+move 49.493032 7
+draw 49.502232 7
+move 49.493832 8
+draw 49.512232 8
+move 49.512232 9
+draw 49.522232 9
+
+"skip-1
+0 1
+
+"acks
+move 10.982674 0
+draw 10.982674 0
+move 11.298738 1
+draw 11.298738 1
+move 11.524802 3
+draw 11.524802 3
+move 11.750866 5
+draw 11.750866 5
+move 11.97693 7
+draw 11.97693 7
+move 12.08693 8
+draw 12.08693 8
+move 12.292994 9
+draw 12.292994 9
+move 29.267646 1
+draw 29.267646 1
+move 29.287646 3
+draw 29.287646 3
+move 29.49371 5
+draw 29.49371 5
+move 29.51371 7
+draw 29.51371 7
+move 29.719774 9
+draw 29.719774 9
+move 49.4894 1
+draw 49.4894 1
+move 49.5094 3
+draw 49.5094 3
+move 49.5294 5
+draw 49.5294 5
+move 49.715464 7
+draw 49.715464 7
+move 49.735464 9
+draw 49.735464 9
+
+"drops
+

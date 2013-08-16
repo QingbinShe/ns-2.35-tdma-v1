@@ -1,0 +1,21 @@
+TitleText: synack_many_fulltcp_
+Device: Postscript
+BoundBox: true
+Ticks: true
+NoLines: true
+Markers: true
+XUnitText: time
+YUnitText: packets
+
+"packets
+0.002032 0
+0.002032 0
+3.002032 0
+3.002032 0
+9.002032 0
+9.002032 0
+
+"acks
+
+"drops
+

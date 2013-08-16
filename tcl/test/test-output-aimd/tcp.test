@@ -1,0 +1,32 @@
+TitleText: nodrop_sack
+Device: Postscript
+BoundBox: true
+Ticks: true
+NoLines: true
+Markers: true
+XUnitText: time
+YUnitText: packets
+
+"packets
+0 0
+0 0
+0.30088 0.01
+0.30088 0.01
+0.30088 0.02
+0.30188 0.02
+0.52232 0.03
+0.52232 0.03
+0.52232 0.04
+0.52232 0.05
+0.52332 0.04
+0.52432 0.05
+0.74376 0.06
+0.74376 0.06
+0.74376 0.07
+0.74476 0.07
+
+"acks
+0 1
+
+"drops
+

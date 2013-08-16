@@ -1,0 +1,28 @@
+# TESTNAME: media2
+# TOPOLOGY: cache0
+# avg-page-size: 4096
+# avg-req-interval: 600
+# cache-sizefac: 0.5
+# client-req-size: 43
+# duration: 500
+# enable-log: 1
+# ns-random-seed: 188312339
+# num-pages: 1
+# obj-layer: 1
+# prot: media2
+# req-dist: Poisson
+# total-requests: 10
+10 i 2 S MOD p _o71:0 m 10 n 9 
+49.14706 i 0 C GET p _o71:0 s 1 z 43 
+49.47606 i 1 E MISS p _o71:0 c 0 s 2 z 43 
+49.677585 i 1 E ENT p _o71:0 m -1 z 4096 s 2 
+49.677585 i 1 E SND c 0 p _o71:0 z 4096 
+49.733047 i 1 E RSEG p _o71:0 l 0 s 0 e 1024 z 1024 f 0
+49.789442 i 0 C RCV p _o71:0 s 1 l 0.6423824762 z 4096 
+50.035728 i 0 C RSEG p _o71:0 l 0 s 0 e 1024 z 1024
+51.733047 i 1 E RSEG p _o71:0 l 0 s 1024 e 2048 z 1024 f 0
+51.785895 i 1 E RSEG p _o71:0 l 0 s 2048 e 3072 z 1024 f 0
+51.838743 i 1 E RSEG p _o71:0 l 0 s 3072 e 4096 z 1024 f 0
+52.035728 i 0 C RSEG p _o71:0 l 0 s 1024 e 2048 z 1024
+52.623871 i 0 C RSEG p _o71:0 l 0 s 2048 e 3072 z 1024
+53.212014 i 0 C RSEG p _o71:0 l 0 s 3072 e 4096 z 1024

@@ -1,0 +1,26 @@
+TitleText: rate_request3
+Device: Postscript
+BoundBox: true
+Ticks: true
+NoLines: true
+Markers: true
+XUnitText: time
+YUnitText: packets
+
+"packets
+0.002 0
+0.002 0
+1.014016 0.01
+1.014016 0.01
+1.014024 0.02
+1.014099 0.02
+
+"skip-1
+0 1
+
+"skip-2
+0 1
+
+"drops
+
+2 0

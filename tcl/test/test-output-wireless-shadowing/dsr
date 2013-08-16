@@ -1,0 +1,3 @@
+M 0.0 nn:50 x:670 y:670 rp:dsr
+M 0.0 sc:../mobility/scene/scen-670x670-50-600-20-0 cp:../mobility/scene/cbr-50-20-4-512 seed:0.0
+M 0.0 prop:Propagation/Shadowing ant:Antenna/OmniAntenna

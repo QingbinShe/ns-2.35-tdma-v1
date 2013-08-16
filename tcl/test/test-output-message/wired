@@ -1,0 +1,153 @@
+Node 5 is sending {1:first message}
+Node 4 received {1:first message}
+Node 6 received {1:first message}
+Node 3 received {1:first message}
+Node 0 received {1:first message}
+Node 2 received {1:first message}
+Node 1 received {1:first message}
+Node 9 received {1:first message}
+Node 1 received redundant copy of message #1
+Node 28 received {1:first message}
+Node 2 received redundant copy of message #1
+Node 8 received {1:first message}
+Node 10 received {1:first message}
+Node 34 received {1:first message}
+Node 29 received {1:first message}
+Node 7 received {1:first message}
+Node 24 received {1:first message}
+Node 11 received {1:first message}
+Node 29 received redundant copy of message #1
+Node 33 received {1:first message}
+Node 30 received {1:first message}
+Node 10 received redundant copy of message #1
+Node 13 received {1:first message}
+Node 16 received {1:first message}
+Node 23 received {1:first message}
+Node 25 received {1:first message}
+Node 12 received {1:first message}
+Node 32 received {1:first message}
+Node 31 received {1:first message}
+Node 21 received {1:first message}
+Node 12 received redundant copy of message #1
+Node 15 received {1:first message}
+Node 17 received {1:first message}
+Node 14 received {1:first message}
+Node 22 received {1:first message}
+Node 26 received {1:first message}
+Node 13 received redundant copy of message #1
+Node 31 received redundant copy of message #1
+Node 32 received redundant copy of message #1
+Node 22 received redundant copy of message #1
+Node 27 received {1:first message}
+Node 14 received redundant copy of message #1
+Node 18 received {1:first message}
+Node 15 received redundant copy of message #1
+Node 20 received {1:first message}
+Node 21 received redundant copy of message #1
+Node 27 received redundant copy of message #1
+Node 26 received redundant copy of message #1
+Node 19 received {1:first message}
+Node 19 received redundant copy of message #1
+Node 20 received redundant copy of message #1
+Node 17 is sending {2:another one}
+Node 16 received {2:another one}
+Node 18 received {2:another one}
+Node 7 received {2:another one}
+Node 15 received {2:another one}
+Node 19 received {2:another one}
+Node 8 received {2:another one}
+Node 13 received {2:another one}
+Node 14 received {2:another one}
+Node 20 received {2:another one}
+Node 9 received {2:another one}
+Node 24 received {2:another one}
+Node 12 received {2:another one}
+Node 20 received redundant copy of message #2
+Node 23 received {2:another one}
+Node 14 received redundant copy of message #2
+Node 0 received {2:another one}
+Node 10 received {2:another one}
+Node 23 received redundant copy of message #2
+Node 25 received {2:another one}
+Node 11 received {2:another one}
+Node 22 received {2:another one}
+Node 24 received redundant copy of message #2
+Node 1 received {2:another one}
+Node 6 received {2:another one}
+Node 11 received redundant copy of message #2
+Node 29 received {2:another one}
+Node 26 received {2:another one}
+Node 10 received redundant copy of message #2
+Node 21 received {2:another one}
+Node 2 received {2:another one}
+Node 5 received {2:another one}
+Node 30 received {2:another one}
+Node 28 received {2:another one}
+Node 27 received {2:another one}
+Node 30 received redundant copy of message #2
+Node 27 received redundant copy of message #2
+Node 3 received {2:another one}
+Node 28 received redundant copy of message #2
+Node 4 received {2:another one}
+Node 31 received {2:another one}
+Node 21 received redundant copy of message #2
+Node 34 received {2:another one}
+Node 2 received redundant copy of message #2
+Node 21 received redundant copy of message #2
+Node 4 received redundant copy of message #2
+Node 3 received redundant copy of message #2
+Node 32 received {2:another one}
+Node 33 received {2:another one}
+Node 33 received redundant copy of message #2
+Node 32 received redundant copy of message #2
+Node 24 is sending {abc:yet another one}
+Node 8 received {abc:yet another one}
+Node 23 received {abc:yet another one}
+Node 25 received {abc:yet another one}
+Node 7 received {abc:yet another one}
+Node 9 received {abc:yet another one}
+Node 14 received {abc:yet another one}
+Node 22 received {abc:yet another one}
+Node 26 received {abc:yet another one}
+Node 13 received {abc:yet another one}
+Node 16 received {abc:yet another one}
+Node 0 received {abc:yet another one}
+Node 10 received {abc:yet another one}
+Node 15 received {abc:yet another one}
+Node 20 received {abc:yet another one}
+Node 21 received {abc:yet another one}
+Node 27 received {abc:yet another one}
+Node 12 received {abc:yet another one}
+Node 15 received redundant copy of message #abc
+Node 17 received {abc:yet another one}
+Node 1 received {abc:yet another one}
+Node 6 received {abc:yet another one}
+Node 11 received {abc:yet another one}
+Node 29 received {abc:yet another one}
+Node 16 received redundant copy of message #abc
+Node 19 received {abc:yet another one}
+Node 30 received {abc:yet another one}
+Node 27 received redundant copy of message #abc
+Node 21 received redundant copy of message #abc
+Node 11 received redundant copy of message #abc
+Node 18 received {abc:yet another one}
+Node 2 received {abc:yet another one}
+Node 5 received {abc:yet another one}
+Node 12 received redundant copy of message #abc
+Node 30 received redundant copy of message #abc
+Node 28 received {abc:yet another one}
+Node 18 received redundant copy of message #abc
+Node 31 received {abc:yet another one}
+Node 29 received redundant copy of message #abc
+Node 19 received redundant copy of message #abc
+Node 3 received {abc:yet another one}
+Node 28 received redundant copy of message #abc
+Node 4 received {abc:yet another one}
+Node 34 received {abc:yet another one}
+Node 2 received redundant copy of message #abc
+Node 32 received {abc:yet another one}
+Node 4 received redundant copy of message #abc
+Node 3 received redundant copy of message #abc
+Node 33 received {abc:yet another one}
+Node 33 received redundant copy of message #abc
+Node 32 received redundant copy of message #abc
