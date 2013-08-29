@@ -54,7 +54,6 @@
 // Preamble TDMA MAC layer for single hop.
 // Centralized slot assignment computing.
 
-
 #include "delay.h"
 #include "connector.h"
 #include "packet.h"
@@ -191,7 +190,7 @@ MacTdma::MacTdma(PHY_MIB* p) :
 	   In the simple case now, they are just equal. 
 	*/
 	max_slot_num_ = max_node_num_;
-	
+
 	/* Much simplified centralized scheduling algorithm for single hop
 	   topology, like WLAN etc. 
 	*/
@@ -216,7 +215,7 @@ MacTdma::MacTdma(PHY_MIB* p) :
 	radio_active_ = 0;
 
 	// Do slot scheduling.
-	re_schedule();
+	//re_schedule();
 
 	/* Deal with preamble. */
 	// Can't send anything in the first frame.
@@ -310,14 +309,25 @@ int MacTdma::is_idle() {
    The idea of postphone the slot scheduling for one slot time may be useful.
 */
 void MacTdma::re_schedule() {
-	static int slot_pointer = 0;
+//	static int slot_pointer = 0;
 	// Record the start time of the new schedule.
 	start_time_ = NOW;
 	/* Seperate slot_num_ and the node id: 
 	   we may have flexibility as node number changes.
 	*/
-	slot_num_ = slot_pointer++;
-	tdma_schedule_[slot_num_] = (char) index_;
+//	slot_num_ = slot_pointer++;
+//test if the re_schedule() can work when it is in recv() but not in MacTdma()
+//      if (slot_pointer == 3) slot_pointer = 0;
+        printf("in re_schedule() before switch,index_ is %d\n",index_);
+        switch(index_){
+            case 0:slot_num_ = 2; break;
+            case 1:slot_num_ = 1; break;
+            case 2:slot_num_ = 0; break;
+        }
+        printf("in re_schedule() after switch,index_ is %d\n",index_);
+//test in the source code, if the re_schedule() can allot slot by other order(re_schedule() is in MacTdma())
+
+        tdma_schedule_[slot_num_] = (char) index_;
 }
 
 /* To handle incoming packet. */
@@ -327,6 +337,10 @@ void MacTdma::recv(Packet* p, Handler* h) {
 	/* Incoming packets from phy layer, send UP to ll layer. 
 	   Now, it is in receiving mode. 
 	*/
+//when tdma_=1,it means aodv ask tdma to allot slot
+        if (ch->tdma_ == 1)
+            re_schedule();
+
 	if (ch->direction() == hdr_cmn::UP) {
 		// Since we can't really turn the radio off at lower level, 
 		// we just discard the packet.
@@ -496,10 +510,10 @@ void MacTdma::makePreamble()
 	if (pktTx_) {
 		dh = HDR_MAC_TDMA(pktTx_);  
 		dst = ETHER_ADDR(dh->dh_da);
-		//printf("<%d>, %f, write %d to slot %d in preamble\n", index_, NOW, dst, slot_num_);
+		printf("<%d>, %f, write node %d to slot %d in preamble\n", index_, NOW, dst, slot_num_);
 		tdma_preamble_[slot_num_] = dst;
 	} else {
-		//printf("<%d>, %f, write NO_PKT to slot %d in preamble\n", index_, NOW, slot_num_);
+		printf("<%d>, %f, write NO_PKT to slot %d in preamble\n", index_, NOW, slot_num_);
 		tdma_preamble_[slot_num_] = NOTHING_TO_SEND;
 	}
 }

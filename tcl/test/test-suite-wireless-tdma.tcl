@@ -68,8 +68,8 @@ set AgentTrace			ON
 set RouterTrace			OFF
 set MacTrace			OFF
 
-Mac/Tdma set slot_packet_len_	512
-Mac/Tdma set max_node_num_	50
+#Mac/Tdma set slot_packet_len_	512
+#Mac/Tdma set max_node_num_	3
 
 LL set mindelay_		50us
 LL set delay_			25us
@@ -150,7 +150,7 @@ Test/dsdv instproc init {} {
     set opt(rp)         DSDV
     set opt(cp)		"../mobility/scene/cbr-50-20-4-512" 
     set opt(sc)		"../mobility/scene/scen-670x670-50-600-20-0" ;
-    set opt(nn)		50	      
+    set opt(nn)		3	      
     set opt(stop)       1000.0
     
 	$self next
@@ -208,7 +208,7 @@ Test/dsr instproc init {} {
 	set opt(ifq)        CMUPriQueue
 	set opt(cp)         "../mobility/scene/cbr-50-20-4-512"
 	set opt(sc)         "../mobility/scene/scen-670x670-50-600-20-0" ;
-	set opt(nn)         50
+	set opt(nn)         3
 	set opt(stop)       1000.0
 	
 	$self next

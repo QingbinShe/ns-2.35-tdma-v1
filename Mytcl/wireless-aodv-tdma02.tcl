@@ -19,7 +19,7 @@ set val(rp)      AODV                         ;#无线路由协议：AODV
 set val(nn)      3                            ;#节点数目：3
 set val(x)       1000                         ;#仿真区域长度160m
 set val(y)       1000                         ;#仿真区域宽度100m
-set val(stop)    2.1                          ;#设定模拟时间50s
+set val(stop)    1.0                          ;#设定模拟时间2.0s
 
 #
 #==============启动实例和文件等===============================
@@ -95,7 +95,7 @@ $ns connect $udp(0) $null(0)            ;#连接两个代理
 set cbr(0) [new Application/Traffic/CBR] ;#在UDP代理上建立CBR流
 $cbr(0) attach-agent $udp(0)
 
-#建立数据流1从节点2到节点0
+#建立数据流1从节点1到节点2
 set udp(1) [new Agent/UDP]
 $ns attach-agent $n(1) $udp(1)
 set null(1) [new Agent/Null]
@@ -104,15 +104,28 @@ $ns connect $udp(1) $null(1)
 set cbr(1) [new Application/Traffic/CBR]
 $cbr(1) attach-agent $udp(1)
 
+#建立数据流2从节点2到节点1
+set udp(2) [new Agent/UDP]
+$ns attach-agent $n(2) $udp(2)
+set null(2) [new Agent/Null]
+$ns attach-agent $n(1) $null(2)
+$ns connect $udp(2) $null(2)
+set cbr(2) [new Application/Traffic/CBR]
+$cbr(2) attach-agent $udp(2)
+
 for {set i 0} {$i < $val(nn)} {incr i} {
     $ns at $val(stop) "$n($i) reset"
 }
 
 for {set i 0} {$i < 2} {incr i} {
     $cbr($i) set rate_ $opt(rate)Kb          ;#设定数据流的数据速率
-    $ns at 0.1 "$cbr($i) start"              ;#设定数据流的启动时间
-    $ns at 2.0 "$cbr($i) stop"               ;#设定数据流的停止时间
+    $ns at 0.5 "$cbr($i) start"              ;#设定数据流的启动时间
+    $ns at 0.6 "$cbr($i) stop"               ;#设定数据流的停止时间
 }
+$cbr(2) set rate_ $opt(rate)Kb
+$ns at 0.6 "$cbr(2) start"
+$ns at 1.0 "$cbr(2) stop"
+
 
 #
 #======================结束模拟==============================

@@ -563,6 +563,9 @@ struct hdr_ip *ih = HDR_IP(p);
  // XXXXX NOTE: use of incoming flag has been depracated; In order to track direction of pkt flow, direction_ in hdr_cmn is used instead. see packet.h for details.
 
  if(ch->ptype() == PT_AODV) {
+
+  // ch->tdma_ = 1;    //to notify tdma to allot slot
+
    ih->ttl_ -= 1;
    recvAODV(p);
    return;
@@ -617,6 +620,7 @@ else if(ih->saddr() == index) {
 void
 AODV::recvAODV(Packet *p) {
  struct hdr_aodv *ah = HDR_AODV(p);
+ struct hdr_cmn *ch = HDR_CMN(p);
 
  assert(HDR_IP (p)->sport() == RT_PORT);
  assert(HDR_IP (p)->dport() == RT_PORT);
@@ -627,6 +631,7 @@ AODV::recvAODV(Packet *p) {
  switch(ah->ah_type) {
 
  case AODVTYPE_RREQ:
+   ch->tdma_ = 1;        //if receive rreq packet, then ask tdma to allot slot
    recvRequest(p);
    break;
 
