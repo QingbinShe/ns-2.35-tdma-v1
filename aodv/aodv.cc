@@ -558,6 +558,10 @@ AODV::recv(Packet *p, Handler*) {
 struct hdr_cmn *ch = HDR_CMN(p);
 struct hdr_ip *ih = HDR_IP(p);
 
+/////////////////////////////////////////////
+ch->my_tdma_ = 1;
+//////////////////////////////////////////
+
  assert(initialized());
  //assert(p->incoming == 0);
  // XXXXX NOTE: use of incoming flag has been depracated; In order to track direction of pkt flow, direction_ in hdr_cmn is used instead. see packet.h for details.
@@ -631,7 +635,7 @@ AODV::recvAODV(Packet *p) {
  switch(ah->ah_type) {
 
  case AODVTYPE_RREQ:
-   ch->tdma_ = 1;        //if receive rreq packet, then ask tdma to allot slot
+ //  ch->tdma_ = 1;        //if receive rreq packet, then ask tdma to allot slot
    recvRequest(p);
    break;
 

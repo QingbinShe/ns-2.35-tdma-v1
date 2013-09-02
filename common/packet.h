@@ -597,7 +597,7 @@ enum ns_af_enum { NS_AF_NONE, NS_AF_ILINK, NS_AF_INET };
 enum ModulationScheme {BPSK = 0, QPSK = 1, QAM16 = 2, QAM64 = 3};
 
 struct hdr_cmn {
-        int tdma_;              //let aodv notify tdma to allot slot
+        static int my_tdma_;              //let aodv notify tdma to allot slot
 
 	enum dir_t { DOWN= -1, NONE= 0, UP= 1 };
 	packet_t ptype_;	// packet type (see above)
@@ -671,7 +671,6 @@ struct hdr_cmn {
 	ModulationScheme mod_scheme_;
 	inline ModulationScheme& mod_scheme() { return (mod_scheme_); }
 };
-
 
 class PacketHeaderClass : public TclClass {
 protected:
@@ -843,5 +842,4 @@ Packet::dump_header(Packet *p, int offset, int length)
                         p->bits_[offset + i + 14], p->bits_[offset + i + 15]);
         }
 }
-
 #endif
