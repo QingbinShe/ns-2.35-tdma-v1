@@ -10,7 +10,7 @@ set opt(rate)    30                    ;#默认的数据发送速率为30bit/s
 set val(chan)    Channel/WirelessChannel      ;#物理信道类型：无线信道
 set val(prop)    Propagation/TwoRayGround     ;#无线传输模型：TwoRayGround
 set val(netif)   Phy/WirelessPhy              ;#网络接口类型：无线物理层
-set val(mac)     Mac/802_11                     ;#MAC层：Tdma
+set val(mac)     Mac/Tdma                     ;#MAC层：Tdma
 set val(ifq)     Queue/DropTail/PriQueue      ;#接口队列类型：IFQ队列
 set val(ll)      LL                           ;#逻辑链路层类型：LL层
 set val(ant)     Antenna/OmniAntenna          ;#天线模型：全向天线
@@ -19,7 +19,7 @@ set val(rp)      AODV                         ;#无线路由协议：AODV
 set val(nn)      9                            ;#节点数目：9
 set val(x)       1000                         ;#仿真区域长度1000m
 set val(y)       1000                         ;#仿真区域宽度1000m
-set val(stop)    1.0                          ;#设定模拟时间1.0s
+set val(stop)    2.0                          ;#设定模拟时间1.0s
 
 #
 #==============启动实例和文件等===============================
@@ -55,9 +55,9 @@ $ns node-config -adhocRouting $val(rp) \
                 -phyType $val(netif) \
                 -channel $chan_1_ \
                 -topoInstance $topo \
-                -agentTrace ON \
+                -agentTrace OFF \
                 -routerTrace OFF \
-                -macTrace OFF \
+                -macTrace ON \
                 -movementTrace OFF
 
 #建立节点的位置
@@ -122,34 +122,35 @@ $ns initial_node_pos $n(8) 10
 #getopt $argc $argv
 #puts "opt(rate)=$opt(rate)"
 
-#建立数据流0从节点0到节点8
+#建立数据流0从节点0到节点6
 set udp(0) [new Agent/UDP]              ;#建立数据发送代理
 $ns attach-agent $n(0) $udp(0)          ;#将数据发送代理绑定到节点0
 set null(0) [new Agent/Null]            ;#建立一个数据接收代理
-$ns attach-agent $n(8) $null(0)         ;#将数据接收代理绑定到节点2
+$ns attach-agent $n(6) $null(0)         ;#将数据接收代理绑定到节点2
 $ns connect $udp(0) $null(0)            ;#连接两个代理
 set cbr(0) [new Application/Traffic/CBR] ;#在UDP代理上建立CBR流
 $cbr(0) attach-agent $udp(0)
 
 #建立数据流1从节点6到节点2
-set udp(1) [new Agent/UDP]
-$ns attach-agent $n(6) $udp(1)
-set null(1) [new Agent/Null]
-$ns attach-agent $n(2) $null(1)
-$ns connect $udp(1) $null(1)
-set cbr(1) [new Application/Traffic/CBR]
-$cbr(1) attach-agent $udp(1)
+#set udp(1) [new Agent/UDP]
+#$ns attach-agent $n(6) $udp(1)
+#set null(1) [new Agent/Null]
+#$ns attach-agent $n(2) $null(1)
+#$ns connect $udp(1) $null(1)
+#set cbr(1) [new Application/Traffic/CBR]
+#$cbr(1) attach-agent $udp(1)
 
 for {set i 0} {$i < $val(nn)} {incr i} {
     $ns at $val(stop) "$n($i) reset"
 }
 
-for {set i 0} {$i < 2} {incr i} {
-    $cbr($i) set rate_ $opt(rate)Kb          ;#设定数据流的数据速率
-    $ns at 0.0 "$cbr($i) start"              ;#设定数据流的启动时间
-    $ns at 1.0 "$cbr($i) stop"               ;#设定数据流的停止时间
-}
+$cbr(0) set rate_ $opt(rate)Kb          ;#设定数据流的数据速率
+$ns at 0.0 "$cbr(0) start"              ;#设定数据流的启动时间
+$ns at 2.0 "$cbr(0) stop"               ;#设定数据流的停止时间
 
+#$cbr(1) set rate_ $opt(rate)Kb
+#$ns at 0.5 "$cbr(1) start"
+#$ns at 1.0 "$cbr(1) stop"
 #
 #======================结束模拟==============================
 #

@@ -238,9 +238,10 @@ struct slotToDst{
 };
 //there are 5 slots
 class SlotUsageTable{
-  public:
+  private:
     slotToDst slotTable[5];
-
+  
+  public:
     int searchSlotTable();
 };
 
