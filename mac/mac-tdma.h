@@ -230,29 +230,12 @@ public:
 	void	handle(Event *e);
 };
 
-
-//record if the slot is used and the slot is send data to dst
-struct slotToDst{
-  int i;
-  u_int32_t dst;
-};
-//there are 5 slots
-class SlotUsageTable{
-  public:
-    slotToDst slotTable[5];
-
-    int searchSlotTable();
-};
-
-
 /* TDMA Mac layer. */
 class MacTdma : public Mac {
   friend class SlotTdmaTimer;
   friend class TxPktTdmaTimer;
   friend class RxPktTdmaTimer;
 
-  friend class SlotUsageTable;
-  
  public:
   MacTdma(PHY_MIB* p);
   void		recv(Packet *p, Handler *h);
@@ -270,14 +253,14 @@ class MacTdma : public Mac {
   
   // Both the slot length and max slot num (max node num) can be configged.
   int			slot_packet_len_;
- // int                   max_node_num_;
+  int                   max_node_num_;
   
  private:
   int command(int argc, const char*const* argv);
 
   // Do slot scheduling for the active nodes within one cluster.
-  //void re_schedule();
-  //void makePreamble();
+  void re_schedule();
+  void makePreamble();
   void radioSwitch(int i);
 
   /* Packet Transmission Functions.*/
@@ -320,8 +303,6 @@ class MacTdma : public Mac {
   TxPktTdmaTimer mhTxPkt_;
   RxPktTdmaTimer mhRxPkt_;
 
-  SlotUsageTable slotTb_;
-
   /* Internal MAC state */
   MacState	rx_state_;	// incoming state (MAC_RECV or MAC_IDLE)
   MacState	tx_state_;	// outgoing state
@@ -337,7 +318,7 @@ class MacTdma : public Mac {
      Currently, we only use a centralized simplified way to do 
      scheduling. Will work on the algorithm later.*/
   // The max num of slot within one frame.
-  //static int max_slot_num_;
+  static int max_slot_num_;
 
   // The time duration for each slot.
   static double slot_time_;
@@ -348,10 +329,10 @@ class MacTdma : public Mac {
   /* Data structure for tdma scheduling. */
   static int active_node_;            // How many nodes needs to be scheduled
 
-  //static int *tdma_schedule_;
+  static int *tdma_schedule_;
   int slot_num_;                      // The slot number it's allocated.
 
-  //static int *tdma_preamble_;        // The preamble data structure.
+  static int *tdma_preamble_;        // The preamble data structure.
 
   // When slot_count_ = active_nodes_, a new preamble is needed.
   int slot_count_;
@@ -363,10 +344,10 @@ class MacTdma : public Mac {
 
 double MacTdma::slot_time_ = 0;
 double MacTdma::start_time_ = 0;
-int MacTdma::active_node_ = 9;
-//int MacTdma::max_slot_num_ = 0;
-//int *MacTdma::tdma_schedule_ = NULL;
-//int *MacTdma::tdma_preamble_ = NULL;
+int MacTdma::active_node_ = 0;
+int MacTdma::max_slot_num_ = 0;
+int *MacTdma::tdma_schedule_ = NULL;
+int *MacTdma::tdma_preamble_ = NULL;
 
 int MacTdma::tdma_ps_ = 0;
 int MacTdma::tdma_pr_ = 0;

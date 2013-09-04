@@ -54,6 +54,7 @@
 // Preamble TDMA MAC layer for single hop.
 // Centralized slot assignment computing.
 
+
 #include "delay.h"
 #include "connector.h"
 #include "packet.h"
@@ -178,10 +179,10 @@ MacTdma::MacTdma(PHY_MIB* p) :
 	/* Get the parameters of the link (which in bound in mac.cc, 2M by default),
 	   the packet length within one TDMA slot (1500 byte by default), 
 	   and the max number of nodes (64) in the simulations.*/
-	//bind("slot_packet_len_", &slot_packet_len_);
-	//bind("max_node_num_", &max_node_num_);
+	bind("slot_packet_len_", &slot_packet_len_);
+	bind("max_node_num_", &max_node_num_);
 	
-	slot_packet_len_ = 1500;
+	//  slot_packet_len_ = 1500;
 	//  max_node_num_ = 64;
 	// Calculate the slot time based on the MAX allowed data length.
 	slot_time_ = DATA_Time(slot_packet_len_);
@@ -189,24 +190,24 @@ MacTdma::MacTdma(PHY_MIB* p) :
 	/* Calsulate the max slot num within on frame from max node num.
 	   In the simple case now, they are just equal. 
 	*/
-	//max_slot_num_ = max_node_num_;
-
+	max_slot_num_ = max_node_num_;
+	
 	/* Much simplified centralized scheduling algorithm for single hop
 	   topology, like WLAN etc. 
 	*/
 	// Initualize the tdma schedule and preamble data structure.
-	//tdma_schedule_ = new int[max_slot_num_];
-	//tdma_preamble_ = new int[max_slot_num_];
+	tdma_schedule_ = new int[max_slot_num_];
+	tdma_preamble_ = new int[max_slot_num_];
 
 	/* Do each node's initialization. */
 	// Record the initial active node number.
-	//active_node_++;
-        /*
+	active_node_++;
+
 	if (active_node_ > max_node_num_) {
 		printf("Too many nodes taking part in the simulations, aborting...\n");
 		exit(-1);
 	}
-        */
+    
 	// Initial channel / transceiver states. 
 	tx_state_ = rx_state_ = MAC_IDLE;
 	tx_active_ = 0;
@@ -215,37 +216,12 @@ MacTdma::MacTdma(PHY_MIB* p) :
 	radio_active_ = 0;
 
 	// Do slot scheduling.
-	//re_schedule();
+	re_schedule();
 
 	/* Deal with preamble. */
 	// Can't send anything in the first frame.
 	slot_count_ = FIRST_ROUND;
-	//tdma_preamble_[slot_num_] = NOTHING_TO_SEND;
-
-//define the slot table
-if (index_ == 0){
-  slotTb_.slotTable[1].i = 1;
-  slotTb_.slotTable[1].dst = 3;
-}
-if (index_ == 3){
-  slotTb_.slotTable[1].i = -1;
-  slotTb_.slotTable[1].dst = 3;
-//  slotTb_.slotTable[2].i = 1;
-//  slotTb_.slotTable[2].dst = 6;
-}
-//if (index_ == 6){
-//  slotTb_.slotTable[2].i = -1;
-//  slotTb_.slotTable[2].dst = 6;
-//}
-
-
-
-
-
-
-
-
-
+	tdma_preamble_[slot_num_] = NOTHING_TO_SEND;
 
 	//Start the Slot timer..
 	mhSlot_.start((Packet *) (& intr_), 0);  
@@ -333,35 +309,21 @@ int MacTdma::is_idle() {
 /* Do the slot re-scheduling:
    The idea of postphone the slot scheduling for one slot time may be useful.
 */
-/*
 void MacTdma::re_schedule() {
-//	static int slot_pointer = 0;
+	static int slot_pointer = 0;
 	// Record the start time of the new schedule.
 	start_time_ = NOW;
-	//Seperate slot_num_ and the node id: 
-	 //  we may have flexibility as node number changes.
- 	 
-//	slot_num_ = slot_pointer++;
-//test if the re_schedule() can work when it is in recv() but not in MacTdma()
-//      if (slot_pointer == 3) slot_pointer = 0;
-       // printf("in re_schedule() before switch,index_ is %d\n",index_);
-        switch(index_){
-            case 0:slot_num_ = 2; break;
-            case 1:slot_num_ = 1; break;
-            case 2:slot_num_ = 0; break;
-        }
-       // printf("in re_schedule() after switch,index_ is %d\n",index_);
-//test in the source code, if the re_schedule() can allot slot by other order(re_schedule() is in MacTdma())
-
-        tdma_schedule_[slot_num_] = (char) index_;
+	/* Seperate slot_num_ and the node id: 
+	   we may have flexibility as node number changes.
+	*/
+	slot_num_ = slot_pointer++;
+	tdma_schedule_[slot_num_] = (char) index_;
 }
-*/
+
 /* To handle incoming packet. */
-void MacTdma::recv(Packet* p, Handler* h) {	
-        struct hdr_cmn *ch = HDR_CMN(p);
-
-printf("index_ %d's recv() can receive packet\n", index_);
-
+void MacTdma::recv(Packet* p, Handler* h) {
+	struct hdr_cmn *ch = HDR_CMN(p);
+	
 	/* Incoming packets from phy layer, send UP to ll layer. 
 	   Now, it is in receiving mode. 
 	*/
@@ -466,8 +428,6 @@ void MacTdma::send()
 	struct hdr_cmn* ch;
 	double stime;
 
-printf("index_ %d can go into send()", index_);
-
 	/* Check if there is any packet buffered. */
 	if (!pktTx_) {
 		printf("<%d>, %f, no packet buffered.\n", index_, NOW);
@@ -526,7 +486,6 @@ void MacTdma::radioSwitch(int i)
 	}
 }
 
-/*
 // make the new preamble.
 void MacTdma::makePreamble() 
 {
@@ -537,21 +496,20 @@ void MacTdma::makePreamble()
 	if (pktTx_) {
 		dh = HDR_MAC_TDMA(pktTx_);  
 		dst = ETHER_ADDR(dh->dh_da);
-		printf("<%d>, %f, write node %d to slot %d in preamble\n", index_, NOW, dst, slot_num_);
+		//printf("<%d>, %f, write %d to slot %d in preamble\n", index_, NOW, dst, slot_num_);
 		tdma_preamble_[slot_num_] = dst;
 	} else {
-		printf("<%d>, %f, write NO_PKT to slot %d in preamble\n", index_, NOW, slot_num_);
+		//printf("<%d>, %f, write NO_PKT to slot %d in preamble\n", index_, NOW, slot_num_);
 		tdma_preamble_[slot_num_] = NOTHING_TO_SEND;
 	}
 }
-*/
+
 /* Timers' handlers */
 /* Slot Timer:
    For the preamble calculation, we should have it:
    occupy one slot time,
    radio turned on for the whole slot.
 */
-/*
 void MacTdma::slotHandler(Event *e) 
 {
 	// Restart timer for next slot.
@@ -596,36 +554,6 @@ void MacTdma::slotHandler(Event *e)
 	radioSwitch(OFF);
 	slot_count_++;
 	return;
-}
-*/
-//my slotHandler
-void MacTdma::slotHandler(Event *e)
-{
-        mhSlot_.start((Packet *)e, slot_time_);
-        if ((slot_count_ == 5) || (slot_count_ == FIRST_ROUND)) {
-                 radioSwitch(ON);
-                 slot_count_ = 0;
-                 return;
-        }
-
-//if (pktTx_){printf("index_ %d have pktTx_ in slot %d\n", index_, slot_count_);}
-        if ((slotTb_.slotTable[slot_count_].i == 1) &&(pktTx_)) {
-//printf("the i of index_ %d is %d\n", index_, slotTb_.slotTable[slot_count_].i);
-printf("index_ %d can go into send()\n", index_);
-                 send();
-                 slot_count_++;
-                 return;
-        }
-        if ((slotTb_.slotTable[slot_count_].i == -1)/* || ((u_int32_t)slotTb_.slotTable[slot_count_].dst == MAC_BROADCAST)*/){
-//printf("the i of index_ %d is %d\n", index_, slotTb_.slotTable[slot_count_].i);
-printf("index_ %d can go into recv\n", index_);
-                 slot_count_++;
-                 radioSwitch(ON);
-                 return;
-        }
-        radioSwitch(OFF);
-        slot_count_++;
-        return;
 }
 
 void MacTdma::recvHandler(Event *) 
