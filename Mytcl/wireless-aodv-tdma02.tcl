@@ -16,10 +16,10 @@ set val(ll)      LL                           ;#逻辑链路层类型：LL层
 set val(ant)     Antenna/OmniAntenna          ;#天线模型：全向天线
 set val(ifqlen)  50                           ;#网络接口队列大小：50
 set val(rp)      AODV                         ;#无线路由协议：AODV
-set val(nn)      9                            ;#节点数目：9
+set val(nn)      2                            ;#节点数目：9
 set val(x)       1000                         ;#仿真区域长度1000m
 set val(y)       1000                         ;#仿真区域宽度1000m
-set val(stop)    2.0                          ;#设定模拟时间1.0s
+set val(stop)    10.0                          ;#设定模拟时间1.0s
 
 #
 #==============启动实例和文件等===============================
@@ -73,47 +73,47 @@ $n(1) set Y_ 570.0
 $n(1) set Z_ 0.0
 $ns initial_node_pos $n(1) 10
 
-set n(2) [$ns node]
-$n(2) set X_ 200.0
-$n(2) set Y_ 340.0
-$n(2) set Z_ 0.0
-$ns initial_node_pos $n(2) 10
+#set n(2) [$ns node]
+#$n(2) set X_ 200.0
+#$n(2) set Y_ 340.0
+#$n(2) set Z_ 0.0
+#$ns initial_node_pos $n(2) 10
 
-set n(3) [$ns node]
-$n(3) set X_ 430.0
-$n(3) set Y_ 800.0
-$n(3) set Z_ 0.0
-$ns initial_node_pos $n(3) 10
+#set n(3) [$ns node]
+#$n(3) set X_ 430.0
+#$n(3) set Y_ 800.0
+#$n(3) set Z_ 0.0
+#$ns initial_node_pos $n(3) 10
 
-set n(4) [$ns node]
-$n(4) set X_ 430.0
-$n(4) set Y_ 570.0
-$n(4) set Z_ 0.0
-$ns initial_node_pos $n(4) 10
+#set n(4) [$ns node]
+#$n(4) set X_ 430.0
+#$n(4) set Y_ 570.0
+#$n(4) set Z_ 0.0
+#$ns initial_node_pos $n(4) 10
 
-set n(5) [$ns node]
-$n(5) set X_ 430.0
-$n(5) set Y_ 340.0
-$n(5) set Z_ 0.0
-$ns initial_node_pos $n(5) 10
+#set n(5) [$ns node]
+#$n(5) set X_ 430.0
+#$n(5) set Y_ 340.0
+#$n(5) set Z_ 0.0
+#$ns initial_node_pos $n(5) 10
 
-set n(6) [$ns node]
-$n(6) set X_ 660.0
-$n(6) set Y_ 800.0
-$n(6) set Z_ 0.0
-$ns initial_node_pos $n(6) 10
+#set n(6) [$ns node]
+#$n(6) set X_ 660.0
+#$n(6) set Y_ 800.0
+#$n(6) set Z_ 0.0
+#$ns initial_node_pos $n(6) 10
 
-set n(7) [$ns node]
-$n(7) set X_ 660.0
-$n(7) set Y_ 570.0
-$n(7) set Z_ 0.0
-$ns initial_node_pos $n(7) 10
+#set n(7) [$ns node]
+#$n(7) set X_ 660.0
+#$n(7) set Y_ 570.0
+#$n(7) set Z_ 0.0
+#$ns initial_node_pos $n(7) 10
 
-set n(8) [$ns node]
-$n(8) set X_ 660.0
-$n(8) set Y_ 340.0
-$n(8) set Z_ 0.0
-$ns initial_node_pos $n(8) 10
+#set n(8) [$ns node]
+#$n(8) set X_ 660.0
+#$n(8) set Y_ 340.0
+#$n(8) set Z_ 0.0
+#$ns initial_node_pos $n(8) 10
 
 #
 #=====================设置数据流==================================
@@ -126,7 +126,7 @@ $ns initial_node_pos $n(8) 10
 set udp(0) [new Agent/UDP]              ;#建立数据发送代理
 $ns attach-agent $n(0) $udp(0)          ;#将数据发送代理绑定到节点0
 set null(0) [new Agent/Null]            ;#建立一个数据接收代理
-$ns attach-agent $n(6) $null(0)         ;#将数据接收代理绑定到节点2
+$ns attach-agent $n(1) $null(0)         ;#将数据接收代理绑定到节点2
 $ns connect $udp(0) $null(0)            ;#连接两个代理
 set cbr(0) [new Application/Traffic/CBR] ;#在UDP代理上建立CBR流
 $cbr(0) attach-agent $udp(0)
@@ -146,7 +146,7 @@ for {set i 0} {$i < $val(nn)} {incr i} {
 
 $cbr(0) set rate_ $opt(rate)Kb          ;#设定数据流的数据速率
 $ns at 0.0 "$cbr(0) start"              ;#设定数据流的启动时间
-$ns at 2.0 "$cbr(0) stop"               ;#设定数据流的停止时间
+$ns at 10.0 "$cbr(0) stop"               ;#设定数据流的停止时间
 
 #$cbr(1) set rate_ $opt(rate)Kb
 #$ns at 0.5 "$cbr(1) start"

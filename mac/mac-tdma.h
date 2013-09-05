@@ -230,11 +230,24 @@ public:
 	void	handle(Event *e);
 };
 
+//the table to record node's every slot information
+struct slotToDst{
+  int flag;            //mark the slot's usage
+  u_int32_t dst;       //mark the slot's dst address
+};
+class SlotUsageTable{
+  public:
+    slotToDst slotTable[2];      //how many slots system use
+    int searchSlotTable();
+};
+
 /* TDMA Mac layer. */
 class MacTdma : public Mac {
   friend class SlotTdmaTimer;
   friend class TxPktTdmaTimer;
   friend class RxPktTdmaTimer;
+
+  friend class SlotUsageTable;
 
  public:
   MacTdma(PHY_MIB* p);
@@ -242,7 +255,7 @@ class MacTdma : public Mac {
   inline int	hdr_dst(char* hdr, int dst = -2);
   inline int	hdr_src(char* hdr, int src = -2);
   inline int	hdr_type(char* hdr, u_int16_t type = 0);
-  
+
   /* Timer handler */
   void slotHandler(Event *e);
   void recvHandler(Event *e);
@@ -302,6 +315,8 @@ class MacTdma : public Mac {
   SlotTdmaTimer mhSlot_;
   TxPktTdmaTimer mhTxPkt_;
   RxPktTdmaTimer mhRxPkt_;
+
+  SlotUsageTable slotTb_;
 
   /* Internal MAC state */
   MacState	rx_state_;	// incoming state (MAC_RECV or MAC_IDLE)
