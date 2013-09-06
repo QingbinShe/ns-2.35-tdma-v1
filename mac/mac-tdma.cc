@@ -322,32 +322,26 @@ int MacTdma::is_idle() {
 */
 void MacTdma::re_schedule() {
 
-//printf("re_schedule()\n");
-
+	//printf("re_schedule()\n");
 	start_time_ = NOW;
-	
+
+	//structure the time slot table to test the program
 	if (index_ == 0){
-
-//printf("re_schedule(), go into index_ == 0\n");
-
 		slotTb_.slotTable[0].flag = -1;
 		slotTb_.slotTable[0].dst = 0;
 		slotTb_.slotTable[1].flag = 1;
 		slotTb_.slotTable[1].dst = 0;
-		slotTb_.slotTable[2].flag = -1;
+		slotTb_.slotTable[2].flag = 1;
 		slotTb_.slotTable[2].dst = 0;
 		slotTb_.slotTable[3].flag = -1;
 		slotTb_.slotTable[3].dst = 0;
 	}
 	if (index_ == 1) {
-
-//printf("re_schedule(), go into index_ == 1\n");
-
-		slotTb_.slotTable[0].flag = -1;
+		slotTb_.slotTable[0].flag = 1;
 		slotTb_.slotTable[0].dst = 0;
 		slotTb_.slotTable[1].flag = -1;
 		slotTb_.slotTable[1].dst = 0;
-		slotTb_.slotTable[2].flag = 1;
+		slotTb_.slotTable[2].flag = -1;
 		slotTb_.slotTable[2].dst = 0;
 		slotTb_.slotTable[3].flag = -1;
 		slotTb_.slotTable[3].dst = 0;
@@ -362,7 +356,7 @@ void MacTdma::re_schedule() {
 		slotTb_.slotTable[3].flag = 1;
 		slotTb_.slotTable[3].dst = 0;
 	}
-	if (index_ == 3) {
+/*	if (index_ == 3) {
 		slotTb_.slotTable[0].flag = -1;
 		slotTb_.slotTable[0].dst = 0;
 		slotTb_.slotTable[1].flag = 1;
@@ -371,7 +365,7 @@ void MacTdma::re_schedule() {
 		slotTb_.slotTable[2].dst = 0;
 		slotTb_.slotTable[3].flag = -1;
 		slotTb_.slotTable[3].dst = 0;
-	}
+	}*/
 /*	if (index_ == 6) {
 		slotTb_.slotTable[2].flag = -1;
 		slotTb_.slotTable[2].dst = 3;
@@ -624,64 +618,48 @@ void MacTdma::slotHandler(Event *e)
 */
 void MacTdma::slotHandler(Event *e)
 {
-//printf("slotHandler, the slot_count_(%d) of index_(%d)\n", slot_count_, index_);
-
+	//printf("slotHandler, the slot_count_(%d) of index_(%d)\n", slot_count_, index_);
 	mhSlot_.start((Packet *)e, slot_time_);
-/*	if ((slot_count_ == max_slot_num_) || (slot_count_ == FIRST_ROUND)) {
-
-//printf("slotHandler, index_(%d) go to the 1 if\n", index_);
-
-		radioSwitch(ON);
-		//makepreamble需要完成的事情这里需要不？(makepreamble里面的dst和系统有联系，但是我的dst是自己设置的？)
-
-//if (pktTx_) {printf("slotHandler, the slot_count_(%d) of index_(%d) have pktTx_\n", slot_count_, index_);}
-//else printf("slotHandler, the slot_count_(%d) of index_(%d) don't have pktTx_\n", slot_count_, index_);
-
-		slot_count_ = 0;
-		return;
-	}
-*/
 
 	if (slot_count_ == FIRST_ROUND) {
-		radioSwitch(ON);
 		slot_count_ = 0;
 		return;
 	}
-	radioSwitch(ON);
+
+	//if the slot of node is 'send'
 	if (slotTb_.slotTable[slot_count_].flag == 1) {
-
-//printf("slotHandler, index_(%d) go to the 2 if\n", index_);
-
+		//printf("slotHandler, index_(%d) go to the 2 if\n", index_);
+		radioSwitch(ON);
 		if (pktTx_){
 			send();
-//printf("slotHandler, index_(%d) go to send\n", index_);
-
+		//printf("slotHandler, index_(%d) go to send\n", index_);
 		}
-		//else{
-		//	radioSwitch(OFF);
-//printf("slotHandler, index_(%d) go to radioSwitch(OFF)\n", index_);
+		else{
+			radioSwitch(OFF);
+			//printf("slotHandler, index_(%d) go to radioSwitch(OFF)\n", index_);
+		}
 
-		//}
 		slot_count_++;
+		//make sure the slot_count_ is from 0 to max_slot_num_
 		if (slot_count_ == max_slot_num_) {
 			slot_count_ = 0;
 		}
 		return;
 	}
+	//if the slot of node is 'receive'
 	if (slotTb_.slotTable[slot_count_].flag == -1) {
-
-//printf("slotHandler, index_(%d) go to the 3 if\n", index_);
+		//printf("slotHandler, index_(%d) go to the 3 if\n", index_);
+		radioSwitch(ON);
 
 		slot_count_++;
 		if (slot_count_ == max_slot_num_) {
 			slot_count_ = 0;
 		}
-		radioSwitch(ON);
 		return;
 	}
-
-//printf("slotHandler, index_(%d) don't go to if\n", index_);
+	//printf("slotHandler, index_(%d) don't go to if\n", index_);
 }
+
 void MacTdma::recvHandler(Event *) 
 {
 	u_int32_t dst;
