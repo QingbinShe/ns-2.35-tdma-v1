@@ -237,7 +237,7 @@ struct slotToDst{
 };
 class SlotUsageTable{
   public:
-    slotToDst slotTable[2];      //how many slots system use
+    slotToDst slotTable[4];      //how many slots system use
     int searchSlotTable();
 };
 

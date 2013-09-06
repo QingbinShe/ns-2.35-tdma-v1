@@ -14,9 +14,9 @@ set val(mac)     Mac/Tdma                     ;#MAC层：Tdma
 set val(ifq)     Queue/DropTail/PriQueue      ;#接口队列类型：IFQ队列
 set val(ll)      LL                           ;#逻辑链路层类型：LL层
 set val(ant)     Antenna/OmniAntenna          ;#天线模型：全向天线
-set val(ifqlen)  50                           ;#网络接口队列大小：50
+set val(ifqlen)  5000                           ;#网络接口队列大小：50
 set val(rp)      AODV                         ;#无线路由协议：AODV
-set val(nn)      2                            ;#节点数目：9
+set val(nn)      4                            ;#节点数目：9
 set val(x)       1000                         ;#仿真区域长度1000m
 set val(y)       1000                         ;#仿真区域宽度1000m
 set val(stop)    10.0                          ;#设定模拟时间1.0s
@@ -58,7 +58,8 @@ $ns node-config -adhocRouting $val(rp) \
                 -agentTrace OFF \
                 -routerTrace OFF \
                 -macTrace ON \
-                -movementTrace OFF
+                -movementTrace OFF \
+		-phyTrace OFF
 
 #建立节点的位置
 set n(0) [$ns node]
@@ -73,17 +74,17 @@ $n(1) set Y_ 570.0
 $n(1) set Z_ 0.0
 $ns initial_node_pos $n(1) 10
 
-#set n(2) [$ns node]
-#$n(2) set X_ 200.0
-#$n(2) set Y_ 340.0
-#$n(2) set Z_ 0.0
-#$ns initial_node_pos $n(2) 10
+set n(2) [$ns node]
+$n(2) set X_ 200.0
+$n(2) set Y_ 340.0
+$n(2) set Z_ 0.0
+$ns initial_node_pos $n(2) 10
 
-#set n(3) [$ns node]
-#$n(3) set X_ 430.0
-#$n(3) set Y_ 800.0
-#$n(3) set Z_ 0.0
-#$ns initial_node_pos $n(3) 10
+set n(3) [$ns node]
+$n(3) set X_ 200.0
+$n(3) set Y_ 100.0
+$n(3) set Z_ 0.0
+$ns initial_node_pos $n(3) 10
 
 #set n(4) [$ns node]
 #$n(4) set X_ 430.0
@@ -126,7 +127,7 @@ $ns initial_node_pos $n(1) 10
 set udp(0) [new Agent/UDP]              ;#建立数据发送代理
 $ns attach-agent $n(0) $udp(0)          ;#将数据发送代理绑定到节点0
 set null(0) [new Agent/Null]            ;#建立一个数据接收代理
-$ns attach-agent $n(1) $null(0)         ;#将数据接收代理绑定到节点2
+$ns attach-agent $n(3) $null(0)         ;#将数据接收代理绑定到节点2
 $ns connect $udp(0) $null(0)            ;#连接两个代理
 set cbr(0) [new Application/Traffic/CBR] ;#在UDP代理上建立CBR流
 $cbr(0) attach-agent $udp(0)
