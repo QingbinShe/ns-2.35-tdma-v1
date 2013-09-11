@@ -331,17 +331,17 @@ void MacTdma::re_schedule() {
 		slotTb_.slotTable[0].dst = 0;
 		slotTb_.slotTable[1].flag = 1;
 		slotTb_.slotTable[1].dst = 0;
-		slotTb_.slotTable[2].flag = 1;
+		slotTb_.slotTable[2].flag = -1;
 		slotTb_.slotTable[2].dst = 0;
 		slotTb_.slotTable[3].flag = -1;
 		slotTb_.slotTable[3].dst = 0;
 	}
 	if (index_ == 1) {
-		slotTb_.slotTable[0].flag = 1;
+		slotTb_.slotTable[0].flag = -1;
 		slotTb_.slotTable[0].dst = 0;
 		slotTb_.slotTable[1].flag = -1;
 		slotTb_.slotTable[1].dst = 0;
-		slotTb_.slotTable[2].flag = -1;
+		slotTb_.slotTable[2].flag = 1;
 		slotTb_.slotTable[2].dst = 0;
 		slotTb_.slotTable[3].flag = -1;
 		slotTb_.slotTable[3].dst = 0;
@@ -356,17 +356,27 @@ void MacTdma::re_schedule() {
 		slotTb_.slotTable[3].flag = 1;
 		slotTb_.slotTable[3].dst = 0;
 	}
-/*	if (index_ == 3) {
+	if (index_ == 3) {
 		slotTb_.slotTable[0].flag = -1;
 		slotTb_.slotTable[0].dst = 0;
-		slotTb_.slotTable[1].flag = 1;
+		slotTb_.slotTable[1].flag = -1;
 		slotTb_.slotTable[1].dst = 0;
-		slotTb_.slotTable[2].flag = -1;
+		slotTb_.slotTable[2].flag = 1;
 		slotTb_.slotTable[2].dst = 0;
 		slotTb_.slotTable[3].flag = -1;
 		slotTb_.slotTable[3].dst = 0;
-	}*/
-/*	if (index_ == 6) {
+	}
+	if (index_ == 4) {
+                slotTb_.slotTable[0].flag = -1;
+                slotTb_.slotTable[0].dst = 0;
+                slotTb_.slotTable[1].flag = -1;
+                slotTb_.slotTable[1].dst = 0;
+                slotTb_.slotTable[2].flag = -1;
+                slotTb_.slotTable[2].dst = 0;
+                slotTb_.slotTable[3].flag = 1;
+                slotTb_.slotTable[3].dst = 0;
+        }
+	/*	if (index_ == 6) {
 		slotTb_.slotTable[2].flag = -1;
 		slotTb_.slotTable[2].dst = 3;
 	}
