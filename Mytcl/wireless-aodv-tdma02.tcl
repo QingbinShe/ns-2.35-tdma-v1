@@ -55,9 +55,9 @@ $ns node-config -adhocRouting $val(rp) \
                 -phyType $val(netif) \
                 -channel $chan_1_ \
                 -topoInstance $topo \
-                -agentTrace ON \
+                -agentTrace OFF \
                 -routerTrace OFF \
-                -macTrace OFF \
+                -macTrace ON \
                 -movementTrace OFF \
 		-phyTrace OFF
 
@@ -143,6 +143,10 @@ $cbr(1) attach-agent $udp(1)
 
 for {set i 0} {$i < $val(nn)} {incr i} {
     $ns at $val(stop) "$n($i) reset"
+
+    #让aodv能够访问tdma
+    set rp($i) [$n($i) agent 255]
+    $rp($i) set-mac [$n($i) set mac_(0)]
 }
 
 $cbr(0) set rate_ $opt(rate)Kb          ;#设定数据流的数据速率

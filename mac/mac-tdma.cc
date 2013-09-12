@@ -73,6 +73,18 @@
 
 #include <stddef.h>
 
+double MacTdma::slot_time_ = 0;
+double MacTdma::start_time_ = 0;
+int MacTdma::active_node_ = 0;
+int MacTdma::max_slot_num_ = 0;
+int *MacTdma::tdma_schedule_ = NULL;
+int *MacTdma::tdma_preamble_ = NULL;
+
+int MacTdma::tdma_ps_ = 0;
+int MacTdma::tdma_pr_ = 0;
+
+
+
 #define SET_RX_STATE(x)			\
 {					\
 	rx_state_ = (x);			\

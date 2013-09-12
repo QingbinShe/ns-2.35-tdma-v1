@@ -250,6 +250,9 @@ class MacTdma : public Mac {
   friend class SlotUsageTable;
 
  public:
+
+	SlotUsageTable slotTb_;
+
   MacTdma(PHY_MIB* p);
   void		recv(Packet *p, Handler *h);
   inline int	hdr_dst(char* hdr, int dst = -2);
@@ -316,7 +319,7 @@ class MacTdma : public Mac {
   TxPktTdmaTimer mhTxPkt_;
   RxPktTdmaTimer mhRxPkt_;
 
-  SlotUsageTable slotTb_;
+  //SlotUsageTable slotTb_;
 
   /* Internal MAC state */
   MacState	rx_state_;	// incoming state (MAC_RECV or MAC_IDLE)
@@ -357,6 +360,7 @@ class MacTdma : public Mac {
   static int tdma_pr_;
 };
 
+/*
 double MacTdma::slot_time_ = 0;
 double MacTdma::start_time_ = 0;
 int MacTdma::active_node_ = 0;
@@ -366,5 +370,5 @@ int *MacTdma::tdma_preamble_ = NULL;
 
 int MacTdma::tdma_ps_ = 0;
 int MacTdma::tdma_pr_ = 0;
-
+*/
 #endif /* __mac_tdma_h__ */

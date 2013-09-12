@@ -597,7 +597,6 @@ enum ns_af_enum { NS_AF_NONE, NS_AF_ILINK, NS_AF_INET };
 enum ModulationScheme {BPSK = 0, QPSK = 1, QAM16 = 2, QAM64 = 3};
 
 struct hdr_cmn {
-        static int my_tdma_;              //let aodv notify tdma to allot slot
 
 	enum dir_t { DOWN= -1, NONE= 0, UP= 1 };
 	packet_t ptype_;	// packet type (see above)

@@ -43,6 +43,10 @@ The AODV code developed by the CMU/MONARCH group was optimized and tuned by Sami
 #include <aodv/aodv_rqueue.h>
 #include <classifier/classifier-port.h>
 
+////////////////////////////////////////////////////////
+#include "mac/mac-tdma.h"
+////////////////////////////////////////////////////////
+
 /*
   Allows local repair of routes 
 */
@@ -210,6 +214,11 @@ class AODV: public Agent {
         void		recv(Packet *p, Handler *);
 
  protected:
+
+////////////////////////////////////////////////////////////////
+	MacTdma *macTdma;
+///////////////////////////////////////////////////////////////
+
         int             command(int, const char *const *);
         int             initialized() { return 1 && target_; }
 

@@ -62,8 +62,6 @@ Packet* Packet::free_;			// free list
 int hdr_cmn::offset_;			// static offset of common header
 int hdr_flags::offset_;			// static offset of flags header
 
-int hdr_cmn::my_tdma_ = 0;
-
 PacketHeaderClass::PacketHeaderClass(const char* classname, int hdrlen) : 
 	TclClass(classname), hdrlen_(hdrlen), offset_(0)
 {

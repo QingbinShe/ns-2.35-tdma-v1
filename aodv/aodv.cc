@@ -127,6 +127,24 @@ AODV::command(int argc, const char*const* argv) {
 	}
 	return TCL_OK;
     }
+
+    //////////////////////////////////////////////////////////////
+    //let aodv visit tdma
+    ///////////////////////////////////////////////////////////////
+    else if (strcmp(argv[1], "set-mac") == 0) {
+	macTdma = (MacTdma *) TclObject::lookup(argv[2]);
+	if (macTdma == 0) {
+		fprintf(stderr, "MESPAgent:%s lookip %s failed.\n", argv[1],argv[2]);
+		return TCL_ERROR;
+	}
+	else {
+		//test
+		//macTdma -> slotTb_.slotTable[0].flag = 1;
+		//printf("Get Node mac slot_packet_len_:%d\n", macTdma -> slotTb_.slotTable[0].flag);
+		return TCL_OK;
+	}
+    }
+
   }
   return Agent::command(argc, argv);
 }
@@ -555,12 +573,9 @@ Packet *p;
 
 void
 AODV::recv(Packet *p, Handler*) {
+
 struct hdr_cmn *ch = HDR_CMN(p);
 struct hdr_ip *ih = HDR_IP(p);
-
-/////////////////////////////////////////////
-ch->my_tdma_ = 1;
-//////////////////////////////////////////
 
  assert(initialized());
  //assert(p->incoming == 0);
@@ -624,7 +639,6 @@ else if(ih->saddr() == index) {
 void
 AODV::recvAODV(Packet *p) {
  struct hdr_aodv *ah = HDR_AODV(p);
- struct hdr_cmn *ch = HDR_CMN(p);
 
  assert(HDR_IP (p)->sport() == RT_PORT);
  assert(HDR_IP (p)->dport() == RT_PORT);
