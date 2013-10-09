@@ -33,6 +33,10 @@ The AODV code developed by the CMU/MONARCH group was optimized and tuned by Sami
 
 //#include <config.h>
 //#include "aodv.h"
+
+//add by myself
+#include <aodv/aodv_share.h>
+
 #define AODV_MAX_ERRORS 100
 
 
@@ -119,6 +123,8 @@ struct hdr_aodv_reply {
 
         double          rp_timestamp;           // when corresponding REQ sent;
 						// used to compute route discovery latency
+
+	int		rp_slotCondition[MAX_SLOT_NUM_];	//slot's used condition
 						
   inline int size() { 
   int sz = 0;

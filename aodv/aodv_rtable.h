@@ -37,6 +37,9 @@ The AODV code developed by the CMU/MONARCH group was optimized and tuned by Sami
 #include <lib/bsd-list.h>
 #include <scheduler.h>
 
+//add by myself
+#include <aodv/aodv_share.h>
+
 #define CURRENT_TIME    Scheduler::instance().clock()
 #define INFINITY2        0xff
 
@@ -53,6 +56,9 @@ class AODV_Neighbor {
         LIST_ENTRY(AODV_Neighbor) nb_link;
         nsaddr_t        nb_addr;
         double          nb_expire;      // ALLOWED_HELLO_LOSS * HELLO_INTERVAL
+
+	//slot's used condition
+	int	nb_slotCondition[MAX_SLOT_NUM_];
 };
 
 LIST_HEAD(aodv_ncache, AODV_Neighbor);

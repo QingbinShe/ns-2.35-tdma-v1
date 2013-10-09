@@ -1,7 +1,7 @@
 #
 #===============设置默认的参数val(*)===============================
 #
-set opt(rate)    300                    ;#默认的数据发送速率为30bit/s
+set opt(rate)    30                    ;#默认的数据发送速率为30bit/s
 #proc getopt { } {                      ;#过程geiopt从命令行获取速率参数
 #    global opt
 #    set opt(rate) [lindex $argv 0]     

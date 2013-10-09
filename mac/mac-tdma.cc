@@ -408,21 +408,21 @@ void MacTdma::re_schedule() {
 		slotTb_.slotTable[i].dst = -1;
 	}
 	if (index_ == 0) {
-		slotTb_.slotTable[2].flag = 1;
+		slotTb_.slotTable[2].flag = 0;
 	}
 	if (index_ == 1) {
-		slotTb_.slotTable[2].flag = -1;
-		slotTb_.slotTable[3].flag = 1;
+		slotTb_.slotTable[2].flag = 0;
+		slotTb_.slotTable[3].flag = 0;
 	}
 	if (index_ == 2) {
-		slotTb_.slotTable[3].flag = -1;
+		slotTb_.slotTable[3].flag = 0;
 	}
 	if (index_ == 3) {
-		slotTb_.slotTable[4].flag = 1;
+		slotTb_.slotTable[4].flag = 0;
 		slotTb_.slotTable[2].flag = 0;
 	}
 	if (index_ == 4) {
-		slotTb_.slotTable[4].flag = -1;
+		slotTb_.slotTable[4].flag = 0;
 		slotTb_.slotTable[2].flag = 0;
 	}
 

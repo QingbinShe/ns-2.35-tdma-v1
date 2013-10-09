@@ -168,6 +168,7 @@ AODV::AODV(nsaddr_t id) : Agent(PT_AODV),
   logtarget = 0;
   ifqueue = 0;
 
+  
   //test aodv visit tdma:wrong, because initialing the command to let aodv visit tdma is behind initialing the nodes in .tcl
   //printf("Get Node %d mac slot_packet_len_:%d\n", index, macTdma -> slotTb_.slotTable[0].flag);
 }
@@ -1316,6 +1317,11 @@ fprintf(stderr, "sending Hello from %d at %.2f\n", index, Scheduler::instance().
  rh->rp_dst_seqno = seqno;
  rh->rp_lifetime = (1 + ALLOWED_HELLO_LOSS) * HELLO_INTERVAL;
 
+ //to record the slot's used condition
+ for (int i = 0; i < MAX_SLOT_NUM_; i++) {
+   rh->rp_slotCondition[i] = macTdma->slotTb_.slotTable[i].flag;
+ }
+
  // ch->uid() = 0;
  ch->ptype() = PT_AODV;
  ch->size() = IP_HDR_LEN + rh->size();
@@ -1347,6 +1353,11 @@ AODV_Neighbor *nb;
  else {
    nb->nb_expire = CURRENT_TIME +
                    (1.5 * ALLOWED_HELLO_LOSS * HELLO_INTERVAL);
+ 
+ //to record the slot's used condition
+   for (int i = 0; i < MAX_SLOT_NUM_; i++) {
+     nb->nb_slotCondition[i] = rp->rp_slotCondition[i];
+   }
  }
 
  Packet::free(p);
