@@ -56,7 +56,7 @@ The AODV code developed by the CMU/MONARCH group was optimized and tuned by Sami
   Allows AODV to use link-layer (802.11) feedback in determining when
   links are up/down.
 */
-#define AODV_LINK_LAYER_DETECTION
+//#define AODV_LINK_LAYER_DETECTION
 
 /*
   Causes AODV to apply a "smoothing" function to the link layer feedback

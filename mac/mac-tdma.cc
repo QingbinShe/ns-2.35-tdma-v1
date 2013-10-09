@@ -407,12 +407,22 @@ void MacTdma::re_schedule() {
 		slotTb_.slotTable[i].src = -1;
 		slotTb_.slotTable[i].dst = -1;
 	}
+	if (index_ == 0) {
+		slotTb_.slotTable[2].flag = 1;
+	}
+	if (index_ == 1) {
+		slotTb_.slotTable[2].flag = -1;
+		slotTb_.slotTable[3].flag = 1;
+	}
+	if (index_ == 2) {
+		slotTb_.slotTable[3].flag = -1;
+	}
 	if (index_ == 3) {
-		slotTb_.slotTable[1].flag = 0;
+		slotTb_.slotTable[4].flag = 1;
 		slotTb_.slotTable[2].flag = 0;
 	}
 	if (index_ == 4) {
-		slotTb_.slotTable[1].flag = 0;
+		slotTb_.slotTable[4].flag = -1;
 		slotTb_.slotTable[2].flag = 0;
 	}
 
@@ -670,7 +680,7 @@ void MacTdma::slotHandler(Event *e)
 	/*use slot 0 to send or receive hello, rreq, rrep, error packet of AODV
 	*if slot_count_==0 and pktTx_'s type is aodv or arp, send. other time, the radio always keep ON to receive control packet.
 	*/
-	if (slot_count_ == 0) {
+	if ((slot_count_ == 0) || (slot_count_ == 1)) {
 		if (pktTx_) {
 			ch = HDR_CMN(pktTx_);
 			if ((ch->ptype() == PT_AODV) || (ch->ptype() == PT_ARP)) {
@@ -691,9 +701,8 @@ void MacTdma::slotHandler(Event *e)
 	}
 
 	//if the slot of node is 'send'
-	if ((slot_count_ != 0) && (slotTb_.slotTable[slot_count_].flag == 1)) {
+	if ((slot_count_ != 0) && (slot_count_ != 1) && (slotTb_.slotTable[slot_count_].flag == 1)) {
 		//printf("slotHandler, index_(%d) go to the 2 if\n", index_);
-		radioSwitch(ON);
 		if (pktTx_){
 			ch = HDR_CMN(pktTx_);
 			if (ch->ptype() != PT_AODV) {
@@ -713,8 +722,9 @@ void MacTdma::slotHandler(Event *e)
 		}
 		return;
 	}
+
 	//if the slot of node is 'receive'
-	if ((slot_count_ != 0) && (slotTb_.slotTable[slot_count_].flag == -1)) {
+	if ((slot_count_ != 0) && (slot_count_ != 1) && (slotTb_.slotTable[slot_count_].flag == -1)) {
 		//printf("slotHandler, index_(%d) go to the 3 if\n", index_);
 		radioSwitch(ON);
 
@@ -724,8 +734,11 @@ void MacTdma::slotHandler(Event *e)
 		}
 		return;
 	}
+
 	//if the slot of node is 'do nothing'
-	if ((slot_count_ != 0) && (slotTb_.slotTable[slot_count_].flag == 0)) {
+	if ((slot_count_ != 0) && (slot_count_ != 1) && (slotTb_.slotTable[slot_count_].flag == 0)) {
+		radioSwitch(OFF);
+
 		slot_count_++;
 		if (slot_count_ == max_slot_num_) {
 			slot_count_ = 0;
