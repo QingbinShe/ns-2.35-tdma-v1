@@ -167,6 +167,9 @@ AODV::AODV(nsaddr_t id) : Agent(PT_AODV),
 
   logtarget = 0;
   ifqueue = 0;
+
+  //test aodv visit tdma:wrong, because initialing the command to let aodv visit tdma is behind initialing the nodes in .tcl
+  //printf("Get Node %d mac slot_packet_len_:%d\n", index, macTdma -> slotTb_.slotTable[0].flag);
 }
 
 /*
@@ -580,6 +583,10 @@ struct hdr_ip *ih = HDR_IP(p);
  assert(initialized());
  //assert(p->incoming == 0);
  // XXXXX NOTE: use of incoming flag has been depracated; In order to track direction of pkt flow, direction_ in hdr_cmn is used instead. see packet.h for details.
+
+//test if aodv can visit tdma:right, use macTdma should behind the initialing of nodes
+//printf("get node mac slotTable[0].flag:%d\n", macTdma -> slotTb_.slotTable[0].flag);
+
 
  if(ch->ptype() == PT_AODV) {
 

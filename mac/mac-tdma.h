@@ -232,12 +232,15 @@ public:
 
 //the table to record node's every slot information
 struct slotToDst{
-  int flag;            //mark the slot's usage
-  u_int32_t dst;       //mark the slot's dst address
+  int flag;            //mark the slot's usage status(1:sending, -1:receiving(not add now), 0:not used)
+  double expire;       //when to change the slot's flag to 0
+  //use two following variable to mark which slot belong to a packet
+  u_int32_t src;	//mark the slot's source address
+  u_int32_t dst;       //mark the slot's dstination address
 };
 class SlotUsageTable{
   public:
-    slotToDst slotTable[4];      //how many slots system use
+    slotToDst *slotTable;
     int searchSlotTable();
 };
 

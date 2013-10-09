@@ -55,11 +55,14 @@ $ns node-config -adhocRouting $val(rp) \
                 -phyType $val(netif) \
                 -channel $chan_1_ \
                 -topoInstance $topo \
-                -agentTrace OFF \
-                -routerTrace OFF \
-                -macTrace ON \
+                -agentTrace ON \
+                -routerTrace ON \
+                -macTrace OFF \
                 -movementTrace OFF \
 		-phyTrace OFF
+
+#定义节点的slot数目
+Mac/Tdma set max_slot_num_ 5
 
 #建立节点的位置
 set n(0) [$ns node]
@@ -123,20 +126,20 @@ $ns initial_node_pos $n(4) 10
 #getopt $argc $argv
 #puts "opt(rate)=$opt(rate)"
 
-#建立数据流0从节点0到节点6
-set udp(0) [new Agent/UDP]              ;#建立数据发送代理
-$ns attach-agent $n(0) $udp(0)          ;#将数据发送代理绑定到节点0
-set null(0) [new Agent/Null]            ;#建立一个数据接收代理
-$ns attach-agent $n(2) $null(0)         ;#将数据接收代理绑定到节点2
-$ns connect $udp(0) $null(0)            ;#连接两个代理
-set cbr(0) [new Application/Traffic/CBR] ;#在UDP代理上建立CBR流
-$cbr(0) attach-agent $udp(0)
+#建立数据流0从节点0到节点2
+#set udp(0) [new Agent/UDP]              ;#建立数据发送代理
+#$ns attach-agent $n(0) $udp(0)          ;#将数据发送代理绑定到节点0
+#set null(0) [new Agent/Null]            ;#建立一个数据接收代理
+#$ns attach-agent $n(2) $null(0)         ;#将数据接收代理绑定到节点2
+#$ns connect $udp(0) $null(0)            ;#连接两个代理
+#set cbr(0) [new Application/Traffic/CBR] ;#在UDP代理上建立CBR流
+#$cbr(0) attach-agent $udp(0)
 
-#建立数据流1从节点6到节点2
+#建立数据流1从节点4到节点3
 set udp(1) [new Agent/UDP]
-ns attach-agent $n(3) $udp(1)
+ns attach-agent $n(4) $udp(1)
 set null(1) [new Agent/Null]
-$ns attach-agent $n(4) $null(1)
+$ns attach-agent $n(3) $null(1)
 $ns connect $udp(1) $null(1)
 set cbr(1) [new Application/Traffic/CBR]
 $cbr(1) attach-agent $udp(1)
@@ -149,9 +152,9 @@ for {set i 0} {$i < $val(nn)} {incr i} {
     $rp($i) set-mac [$n($i) set mac_(0)]
 }
 
-$cbr(0) set rate_ $opt(rate)Kb          ;#设定数据流的数据速率
-$ns at 0.0 "$cbr(0) start"              ;#设定数据流的启动时间
-$ns at 10.0 "$cbr(0) stop"               ;#设定数据流的停止时间
+#$cbr(0) set rate_ $opt(rate)Kb          ;#设定数据流的数据速率
+#$ns at 0.0 "$cbr(0) start"              ;#设定数据流的启动时间
+#$ns at 10.0 "$cbr(0) stop"               ;#设定数据流的停止时间
 
 $cbr(1) set rate_ $opt(rate)Kb
 $ns at 0.0 "$cbr(1) start"

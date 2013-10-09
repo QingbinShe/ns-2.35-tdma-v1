@@ -202,8 +202,10 @@ MacTdma::MacTdma(PHY_MIB* p) :
 	/* Calsulate the max slot num within on frame from max node num.
 	   In the simple case now, they are just equal. 
 	*/
-	max_slot_num_ = 4;
-	
+	//max_slot_num_ = 4;
+	bind("max_slot_num_", &max_slot_num_);
+	slotTb_.slotTable = new slotToDst[max_slot_num_];
+
 	/* Much simplified centralized scheduling algorithm for single hop
 	   topology, like WLAN etc. 
 	*/
@@ -337,7 +339,7 @@ void MacTdma::re_schedule() {
 	//printf("re_schedule()\n");
 	start_time_ = NOW;
 
-	//structure the time slot table to test the program
+/*	//structure the time slot table to test the program
 	if (index_ == 0){
 		slotTb_.slotTable[0].flag = -1;
 		slotTb_.slotTable[0].dst = 0;
@@ -347,6 +349,8 @@ void MacTdma::re_schedule() {
 		slotTb_.slotTable[2].dst = 0;
 		slotTb_.slotTable[3].flag = -1;
 		slotTb_.slotTable[3].dst = 0;
+		slotTb_.slotTable[4].flag = -1;
+		slotTb_.slotTable[4].dst = 0;
 	}
 	if (index_ == 1) {
 		slotTb_.slotTable[0].flag = -1;
@@ -357,6 +361,8 @@ void MacTdma::re_schedule() {
 		slotTb_.slotTable[2].dst = 0;
 		slotTb_.slotTable[3].flag = -1;
 		slotTb_.slotTable[3].dst = 0;
+		slotTb_.slotTable[4].flag = -1;
+		slotTb_.slotTable[4].dst = 0;
 	}
 	if (index_ == 2) {
 		slotTb_.slotTable[0].flag = -1;
@@ -367,6 +373,8 @@ void MacTdma::re_schedule() {
 		slotTb_.slotTable[2].dst = 0;
 		slotTb_.slotTable[3].flag = 1;
 		slotTb_.slotTable[3].dst = 0;
+		slotTb_.slotTable[4].flag = -1;
+		slotTb_.slotTable[4].dst = 0;
 	}
 	if (index_ == 3) {
 		slotTb_.slotTable[0].flag = -1;
@@ -377,6 +385,8 @@ void MacTdma::re_schedule() {
 		slotTb_.slotTable[2].dst = 0;
 		slotTb_.slotTable[3].flag = -1;
 		slotTb_.slotTable[3].dst = 0;
+		slotTb_.slotTable[4].flag = -1;
+		slotTb_.slotTable[4].dst = 0;
 	}
 	if (index_ == 4) {
                 slotTb_.slotTable[0].flag = -1;
@@ -387,18 +397,25 @@ void MacTdma::re_schedule() {
                 slotTb_.slotTable[2].dst = 0;
                 slotTb_.slotTable[3].flag = 1;
                 slotTb_.slotTable[3].dst = 0;
+		slotTb_.slotTable[4].flag = -1;
+		slotTb_.slotTable[4].dst = 0;
         }
-	/*	if (index_ == 6) {
-		slotTb_.slotTable[2].flag = -1;
-		slotTb_.slotTable[2].dst = 3;
-	}
-	else {
-		for (int i = 0; i < 4; i++){
-			slotTb_.slotTable[i].flag = 0;
-			slotTb_.slotTable[i].dst = 0;
-		}
-	}
 */
+	for (int i = 0; i < max_slot_num_; i++) {
+		slotTb_.slotTable[i].flag = 0;
+		slotTb_.slotTable[i].expire = -1;
+		slotTb_.slotTable[i].src = -1;
+		slotTb_.slotTable[i].dst = -1;
+	}
+	if (index_ == 3) {
+		slotTb_.slotTable[1].flag = 0;
+		slotTb_.slotTable[2].flag = 0;
+	}
+	if (index_ == 4) {
+		slotTb_.slotTable[1].flag = 0;
+		slotTb_.slotTable[2].flag = 0;
+	}
+
 }
 
 /* To handle incoming packet. */
@@ -640,6 +657,8 @@ void MacTdma::slotHandler(Event *e)
 */
 void MacTdma::slotHandler(Event *e)
 {
+	struct hdr_cmn *ch;
+
 	//printf("slotHandler, the slot_count_(%d) of index_(%d)\n", slot_count_, index_);
 	mhSlot_.start((Packet *)e, slot_time_);
 
@@ -648,13 +667,39 @@ void MacTdma::slotHandler(Event *e)
 		return;
 	}
 
+	/*use slot 0 to send or receive hello, rreq, rrep, error packet of AODV
+	*if slot_count_==0 and pktTx_'s type is aodv or arp, send. other time, the radio always keep ON to receive control packet.
+	*/
+	if (slot_count_ == 0) {
+		if (pktTx_) {
+			ch = HDR_CMN(pktTx_);
+			if ((ch->ptype() == PT_AODV) || (ch->ptype() == PT_ARP)) {
+				//printf("%f:index(%d) send the packet(%d)\n", Scheduler::instance().clock(), index_, ch->ptype());
+				send();
+				slot_count_++;
+			}
+			else {
+				radioSwitch(ON);
+				slot_count_++;
+			}
+		}
+		else {
+			radioSwitch(ON);
+			slot_count_++;
+		}
+		return;
+	}
+
 	//if the slot of node is 'send'
-	if (slotTb_.slotTable[slot_count_].flag == 1) {
+	if ((slot_count_ != 0) && (slotTb_.slotTable[slot_count_].flag == 1)) {
 		//printf("slotHandler, index_(%d) go to the 2 if\n", index_);
 		radioSwitch(ON);
 		if (pktTx_){
-			send();
-		//printf("slotHandler, index_(%d) go to send\n", index_);
+			ch = HDR_CMN(pktTx_);
+			if (ch->ptype() != PT_AODV) {
+				send();
+			}
+			//printf("slotHandler, index_(%d) go to send\n", index_);
 		}
 		else{
 			radioSwitch(OFF);
@@ -669,10 +714,18 @@ void MacTdma::slotHandler(Event *e)
 		return;
 	}
 	//if the slot of node is 'receive'
-	if (slotTb_.slotTable[slot_count_].flag == -1) {
+	if ((slot_count_ != 0) && (slotTb_.slotTable[slot_count_].flag == -1)) {
 		//printf("slotHandler, index_(%d) go to the 3 if\n", index_);
 		radioSwitch(ON);
 
+		slot_count_++;
+		if (slot_count_ == max_slot_num_) {
+			slot_count_ = 0;
+		}
+		return;
+	}
+	//if the slot of node is 'do nothing'
+	if ((slot_count_ != 0) && (slotTb_.slotTable[slot_count_].flag == 0)) {
 		slot_count_++;
 		if (slot_count_ == max_slot_num_) {
 			slot_count_ = 0;
