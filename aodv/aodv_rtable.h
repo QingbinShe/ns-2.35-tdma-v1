@@ -51,7 +51,7 @@ class AODV_Neighbor {
         friend class aodv_rt_entry;
  public:
         AODV_Neighbor(u_int32_t a) { nb_addr = a; }
-
+	
  protected:
         LIST_ENTRY(AODV_Neighbor) nb_link;
         nsaddr_t        nb_addr;

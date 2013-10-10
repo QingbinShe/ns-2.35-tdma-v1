@@ -43,6 +43,7 @@ The AODV code developed by the CMU/MONARCH group was optimized and tuned by Sami
 #include <aodv/aodv_rqueue.h>
 #include <classifier/classifier-port.h>
 
+#include <aodv/aodv_packet.h>
 ////////////////////////////////////////////////////////
 #include "mac/mac-tdma.h"
 ////////////////////////////////////////////////////////
@@ -217,7 +218,7 @@ class AODV: public Agent {
  protected:
 
 ////////////////////////////////////////////////////////////////
-	MacTdma *macTdma;
+	MacTdma		*macTdma;
 ///////////////////////////////////////////////////////////////
 
         int             command(int, const char *const *);
@@ -245,6 +246,9 @@ class AODV: public Agent {
          * Neighbor Management
          */
         void            nb_insert(nsaddr_t id);
+	//add myself
+	void		nb_insert(hdr_aodv_reply *rp);
+
         AODV_Neighbor*       nb_lookup(nsaddr_t id);
         void            nb_delete(nsaddr_t id);
         void            nb_purge(void);
