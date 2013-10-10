@@ -1367,6 +1367,7 @@ AODV_Neighbor *nb;
 //if (nb != 0)
 //printf("%f:receive:index(%d) receive hello packet from index(%d). slotflag is:%d,%d,%d,%d,%d,%d,%d\n", CURRENT_TIME, index, rp->rp_dst, rp->rp_slotCondition[0], rp->rp_slotCondition[1], rp->rp_slotCondition[2], rp->rp_slotCondition[3], rp->rp_slotCondition[4], rp->rp_slotCondition[5], rp->rp_slotCondition[6]);
 
+
  //test if hello packet can cash in the list successfully
  /*nb = nbhead.lh_first;
  printf("index(%d)'s neighbor is:\n", index);
