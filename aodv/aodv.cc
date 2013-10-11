@@ -687,6 +687,14 @@ struct hdr_ip *ih = HDR_IP(p);
 struct hdr_aodv_request *rq = HDR_AODV_REQUEST(p);
 aodv_rt_entry *rt;
 
+ //test sendRequest
+ /*printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+ printf("\n%f:index(%d) receive rreq from index(%d):", CURRENT_TIME, index, rq->rq_src);
+ for (int i = 0; i < MAX_SLOT_NUM_; i++) {
+   printf("%d,",rq->rq_free_slot[i]);
+ }
+ printf("\n"); */
+
   /*
    * Drop if:
    *      - I'm the source
@@ -710,6 +718,56 @@ aodv_rt_entry *rt;
    Packet::free(p);
    return;
  }
+
+
+ int temp_free_slot[MAX_SLOT_NUM_];	//to cash the free slot
+ //itself's free time slot
+ for (int i = 0; i < MAX_SLOT_NUM_; i++) {
+     temp_free_slot[i] = 0;
+     if (macTdma->slotTb_.slotTable[i].flag != 0) {
+       temp_free_slot[i] = 1;
+     }
+     else {
+       for (AODV_Neighbor *nb = nbhead.lh_first; nb; nb->nb_link.le_next) {
+         if (nb->nb_slotCondition[i] == 1) {
+           temp_free_slot[i] = 1;
+           break;
+         }
+       }
+     }
+ }
+ //calculate the free time slot of the path
+ for (int i = 0; i < MAX_SLOT_NUM_; i++) {
+   if ((temp_free_slot[i] == 0) && (rq->rq_free_slot[i] == 0)) {
+     temp_free_slot[i] = 0;
+   }
+   else {
+     temp_free_slot[i] = 1;
+   }
+ }
+ //in my project, I just need one slot, find the slot number from 2(0 and 1 send control packet)
+ int free_slot;
+ for (free_slot = 2; free_slot < MAX_SLOT_NUM_; free_slot++) {
+   if (temp_free_slot[free_slot] == 0) {
+     break;
+   }
+ }
+ //drop if there is no free slot in the path
+ if (free_slot == MAX_SLOT_NUM_) {
+   printf("index(%d) has no slot to allocate!!!!\n", index);
+   Packet::free(p);
+   return;
+ }
+
+ //test if the free_slot calculate is right
+ printf("\n%f:index(%d)'s free_slot:%d\n\n", CURRENT_TIME, index, free_slot);
+
+ //change the slot_usage_table
+ macTdma->slotTb_.slotTable[free_slot].flag = -1;
+ macTdma->slotTb_.slotTable[free_slot].expire = CURRENT_TIME + REV_ROUTE_LIFE;
+ macTdma->slotTb_.slotTable[free_slot].src = rq->rq_src;
+ macTdma->slotTb_.slotTable[free_slot].dst = rq->rq_dst;
+
 
  /*
   * Cache the broadcast ID
@@ -800,7 +858,8 @@ rt_update(rt0, rq->rq_src_seqno, rq->rq_hop_count, ih->saddr(),
  }
 
  // I am not the destination, but I may have a fresh enough route.
-
+ // delete, because if node reply here, the behind node will not allocate slot
+/*
  else if (rt && (rt->rt_hops != INFINITY2) && 
 	  	(rt->rt_seqno >= rq->rq_dst_seqno) ) {
 
@@ -835,7 +894,7 @@ rt_update(rt0, rq->rq_src_seqno, rq->rq_hop_count, ih->saddr(),
 // DONE: Included gratuitous replies to be sent as per IETF aodv draft specification. As of now, G flag has not been dynamically used and is always set or reset in aodv-packet.h --- Anant Utgikar, 09/16/02.
 
 	Packet::free(p);
- }
+ }*/
  /*
   * Can't reply. So forward the  Route Request
   */
@@ -843,6 +902,30 @@ rt_update(rt0, rq->rq_src_seqno, rq->rq_hop_count, ih->saddr(),
    ih->saddr() = index;
    ih->daddr() = IP_BROADCAST;
    rq->rq_hop_count += 1;
+
+   //fill the free transmitting time slot set
+   for (int i = 0; i < MAX_SLOT_NUM_; i++) {
+     rq->rq_free_slot[i] = 0;
+     if (macTdma->slotTb_.slotTable[i].flag != 0) {
+       rq->rq_free_slot[i] = 1;
+     }
+     else {
+       for (AODV_Neighbor *nb = nbhead.lh_first; nb; nb->nb_link.le_next) {
+         if (nb->nb_slotCondition[i] == -1) {
+           rq->rq_free_slot[i] = 1;
+           break;
+         }
+       }
+     }
+   }
+   //test the sendrreq
+   /*printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+   printf("\n%f:index(%d) send rreq:\n", CURRENT_TIME, index);
+   for (int i = 0; i < MAX_SLOT_NUM_; i++) {
+     printf("%d,", rq->rq_free_slot[i]);
+   }
+   printf("\n");*/
+
    // Maximum sequence number seen en route
    if (rt) rq->rq_dst_seqno = max(rt->rt_seqno, rq->rq_dst_seqno);
    forward((aodv_rt_entry*) 0, p, DELAY);
@@ -1099,6 +1182,8 @@ struct hdr_ip *ih = HDR_IP(p);
 struct hdr_aodv_request *rq = HDR_AODV_REQUEST(p);
 aodv_rt_entry *rt = rtable.rt_lookup(dst);
 
+//printf("the rreq dst(%d) and src(%d)\n", dst, index);
+
  assert(rt);
 
  /*
@@ -1209,8 +1294,30 @@ aodv_rt_entry *rt = rtable.rt_lookup(dst);
  rq->rq_src_seqno = seqno;
  rq->rq_timestamp = CURRENT_TIME;
 
- Scheduler::instance().schedule(target_, p, 0.);
+ //fill the free transmitting time slot set
+ for (int i = 0; i < MAX_SLOT_NUM_; i++) {
+   rq->rq_free_slot[i] = 0;
+   if (macTdma->slotTb_.slotTable[i].flag != 0) {
+     rq->rq_free_slot[i] = 1;
+   }
+   else {
+     for (AODV_Neighbor *nb = nbhead.lh_first; nb; nb->nb_link.le_next) {
+       if (nb->nb_slotCondition[i] == -1) {
+         rq->rq_free_slot[i] = 1;
+         break;
+       }
+     }
+   }
+ }
+ //test sendrreq
+ /*printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+ printf("\n%f:index(%d) send rreq:\n", CURRENT_TIME, index);
+ for (int i = 0; i < MAX_SLOT_NUM_; i++) {
+   printf("%d,", rq->rq_free_slot[i]);
+ }
+ printf("\n"); */
 
+ Scheduler::instance().schedule(target_, p, 0.);
 }
 
 void

@@ -89,6 +89,8 @@ struct hdr_aodv_request {
         double          rq_timestamp;   // when REQUEST sent;
 					// used to compute route discovery latency
 
+	int		rq_free_slot[MAX_SLOT_NUM_];	//record the free transmitting time slot set(0:free; 1:not free)
+
   // This define turns on gratuitous replies- see aodv.cc for implementation contributed by
   // Anant Utgikar, 09/16/02.
   //#define RREQ_GRAT_RREP	0x80
@@ -124,7 +126,7 @@ struct hdr_aodv_reply {
         double          rp_timestamp;           // when corresponding REQ sent;
 						// used to compute route discovery latency
 
-	int		rp_slotCondition[MAX_SLOT_NUM_];	//slot's used condition
+	int		rp_slotCondition[MAX_SLOT_NUM_];	//slot's used condition(copy from macTdma->slotTb_.slotTable[i].flag, 0:free, 1:send, -1:receive)
 						
   inline int size() { 
   int sz = 0;

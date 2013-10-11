@@ -687,6 +687,56 @@ struct hdr_ip *ih = HDR_IP(p);
 struct hdr_aodv_request *rq = HDR_AODV_REQUEST(p);
 aodv_rt_entry *rt;
 
+ //test sendRequest
+ /*printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+ printf("\n%f:index(%d) receive rreq from index(%d):", CURRENT_TIME, index, rq->rq_src);
+ for (int i = 0; i < MAX_SLOT_NUM_; i++) {
+   printf("%d,",rq->rq_free_slot[i]);
+ }
+ printf("\n"); */
+
+ int temp_free_slot[MAX_SLOT_NUM_];
+ //itself's free time slot
+ for (int i = 0; i < MAX_SLOT_NUM_; i++) {
+     temp_free_slot[i] = 0;
+     if (macTdma->slotTb_.slotTable[i].flag != 0) {
+       temp_free_slot[i] = 1;
+     }
+     else {
+       for (AODV_Neighbor *nb = nbhead.lh_first; nb; nb->nb_link.le_next) {
+         if (nb->nb_slotCondition[i] == 1) {
+           temp_free_slot[i] = 1;
+           break;
+         }
+       }
+     }
+ }
+ //calculate the free time slot of the path
+ for (int i = 0; i < MAX_SLOT_NUM_; i++) {
+   if ((temp_free_slot[i] == 0) && (rq->rq_free_slot[i] == 0)) {
+     temp_free_slot[i] = 0;
+   }
+   else {
+     temp_free_slot[i] = 1;
+   }
+ }
+ //in my project, I just need one slot, find the slot number
+ int free_slot;
+ for (free_slot = 2; free_slot < MAX_SLOT_NUM_; free_slot++) {
+   if (temp_free_slot[free_slot] == 0) {
+     break;
+   }
+ }
+ if (free_slot == MAX_SLOT_NUM_) {
+   printf("index(%d) has no slot to allocate!!!!\n", index);
+   Packet::free(p);
+   return;
+ }
+
+ //test if the free_slot calculate is right
+ //printf("\n%f:index(%d)'s free_slot:%d\n\n", CURRENT_TIME, index, free_slot);
+
+
   /*
    * Drop if:
    *      - I'm the source
@@ -843,6 +893,30 @@ rt_update(rt0, rq->rq_src_seqno, rq->rq_hop_count, ih->saddr(),
    ih->saddr() = index;
    ih->daddr() = IP_BROADCAST;
    rq->rq_hop_count += 1;
+
+   //fill the free transmitting time slot set
+   for (int i = 0; i < MAX_SLOT_NUM_; i++) {
+     rq->rq_free_slot[i] = 0;
+     if (macTdma->slotTb_.slotTable[i].flag != 0) {
+       rq->rq_free_slot[i] = 1;
+     }
+     else {
+       for (AODV_Neighbor *nb = nbhead.lh_first; nb; nb->nb_link.le_next) {
+         if (nb->nb_slotCondition[i] == -1) {
+           rq->rq_free_slot[i] = 1;
+           break;
+         }
+       }
+     }
+   }
+   //test the sendrreq
+   /*printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+   printf("\n%f:index(%d) send rreq:\n", CURRENT_TIME, index);
+   for (int i = 0; i < MAX_SLOT_NUM_; i++) {
+     printf("%d,", rq->rq_free_slot[i]);
+   }
+   printf("\n");*/
+
    // Maximum sequence number seen en route
    if (rt) rq->rq_dst_seqno = max(rt->rt_seqno, rq->rq_dst_seqno);
    forward((aodv_rt_entry*) 0, p, DELAY);
@@ -1099,6 +1173,8 @@ struct hdr_ip *ih = HDR_IP(p);
 struct hdr_aodv_request *rq = HDR_AODV_REQUEST(p);
 aodv_rt_entry *rt = rtable.rt_lookup(dst);
 
+//printf("the rreq dst(%d) and src(%d)\n", dst, index);
+
  assert(rt);
 
  /*
@@ -1209,8 +1285,30 @@ aodv_rt_entry *rt = rtable.rt_lookup(dst);
  rq->rq_src_seqno = seqno;
  rq->rq_timestamp = CURRENT_TIME;
 
- Scheduler::instance().schedule(target_, p, 0.);
+ //fill the free transmitting time slot set
+ for (int i = 0; i < MAX_SLOT_NUM_; i++) {
+   rq->rq_free_slot[i] = 0;
+   if (macTdma->slotTb_.slotTable[i].flag != 0) {
+     rq->rq_free_slot[i] = 1;
+   }
+   else {
+     for (AODV_Neighbor *nb = nbhead.lh_first; nb; nb->nb_link.le_next) {
+       if (nb->nb_slotCondition[i] == -1) {
+         rq->rq_free_slot[i] = 1;
+         break;
+       }
+     }
+   }
+ }
+ //test sendrreq
+ /*printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+ printf("\n%f:index(%d) send rreq:\n", CURRENT_TIME, index);
+ for (int i = 0; i < MAX_SLOT_NUM_; i++) {
+   printf("%d,", rq->rq_free_slot[i]);
+ }
+ printf("\n"); */
 
+ Scheduler::instance().schedule(target_, p, 0.);
 }
 
 void
@@ -1323,7 +1421,7 @@ fprintf(stderr, "sending Hello from %d at %.2f\n", index, Scheduler::instance().
  }
 
 //test hello packet
-printf("%f:index(%d) send hello packet. slotflag is:%d,%d,%d,%d,%d,%d,%d\n", CURRENT_TIME, index, macTdma->slotTb_.slotTable[0].flag, macTdma->slotTb_.slotTable[1].flag, macTdma->slotTb_.slotTable[2].flag, macTdma->slotTb_.slotTable[3].flag, macTdma->slotTb_.slotTable[4].flag, macTdma->slotTb_.slotTable[5].flag, macTdma->slotTb_.slotTable[6].flag);
+//printf("%f:index(%d) send hello packet. slotflag is:%d,%d,%d,%d,%d,%d,%d\n", CURRENT_TIME, index, macTdma->slotTb_.slotTable[0].flag, macTdma->slotTb_.slotTable[1].flag, macTdma->slotTb_.slotTable[2].flag, macTdma->slotTb_.slotTable[3].flag, macTdma->slotTb_.slotTable[4].flag, macTdma->slotTb_.slotTable[5].flag, macTdma->slotTb_.slotTable[6].flag);
 
 
  // ch->uid() = 0;
@@ -1342,7 +1440,6 @@ printf("%f:index(%d) send hello packet. slotflag is:%d,%d,%d,%d,%d,%d,%d\n", CUR
 
  Scheduler::instance().schedule(target_, p, 0.0);
 }
-
 
 void
 AODV::recvHello(Packet *p) {
@@ -1363,16 +1460,51 @@ AODV_Neighbor *nb;
      nb->nb_slotCondition[i] = rp->rp_slotCondition[i];
    }
  }
+
 //test hello packet
-if (nb != 0)
-printf("%f:receive:index(%d) receive hello packet from index(%d). slotflag is:%d,%d,%d,%d,%d,%d,%d\n", CURRENT_TIME, index, rp->rp_dst, rp->rp_slotCondition[0], rp->rp_slotCondition[1], rp->rp_slotCondition[2], rp->rp_slotCondition[3], rp->rp_slotCondition[4], rp->rp_slotCondition[5], rp->rp_slotCondition[6]);
+//if (nb != 0)
+//printf("%f:receive:index(%d) receive hello packet from index(%d). slotflag is:%d,%d,%d,%d,%d,%d,%d\n", CURRENT_TIME, index, rp->rp_dst, rp->rp_slotCondition[0], rp->rp_slotCondition[1], rp->rp_slotCondition[2], rp->rp_slotCondition[3], rp->rp_slotCondition[4], rp->rp_slotCondition[5], rp->rp_slotCondition[6]);
+
+
+ //test if hello packet can cash in the list successfully
+ /*nb = nbhead.lh_first;
+ printf("index(%d)'s neighbor is:\n", index);
+ for (; nb; nb = nb->nb_link.le_next) {
+   printf("neighbor(%d):", nb->nb_addr);
+   for (int i = 0; i < MAX_SLOT_NUM_; i++) {
+     printf("%d,", nb->nb_slotCondition[i]);
+   }
+   printf("\n");
+ }
+ printf("\n");
+*/
 
  Packet::free(p);
 }
 
 void
 AODV::nb_insert(hdr_aodv_reply *rp) {
-AODV_Neighbor *nb = new AODV_Neighbor(rp);
+AODV_Neighbor *nb = new AODV_Neighbor(rp->rp_dst);
+
+ assert(nb);
+ nb->nb_expire = CURRENT_TIME +
+                (1.5 * ALLOWED_HELLO_LOSS * HELLO_INTERVAL);
+
+ for (int i = 0; i < MAX_SLOT_NUM_; i++) {
+   nb->nb_slotCondition[i] = rp->rp_slotCondition[i];
+ }
+
+ LIST_INSERT_HEAD(&nbhead, nb, nb_link);
+ seqno += 2;             // set of neighbors changed
+ assert ((seqno%2) == 0);
+
+//test hello packet
+//printf("%f:insert :index(%d) receive hello packet from index(%d). slotflag is:%d,%d,%d,%d,%d,%d,%d\n", CURRENT_TIME, index, rp->rp_dst, nb->nb_slotCondition[0], nb->nb_slotCondition[1], nb->nb_slotCondition[2], nb->nb_slotCondition[3], nb->nb_slotCondition[4], nb->nb_slotCondition[5], nb->nb_slotCondition[6]);
+}
+
+void
+AODV::nb_insert(nsaddr_t id) {
+AODV_Neighbor *nb = new AODV_Neighbor(id);
 
  assert(nb);
  nb->nb_expire = CURRENT_TIME +
@@ -1380,14 +1512,6 @@ AODV_Neighbor *nb = new AODV_Neighbor(rp);
  LIST_INSERT_HEAD(&nbhead, nb, nb_link);
  seqno += 2;             // set of neighbors changed
  assert ((seqno%2) == 0);
-
-//test hello packet
-printf("%f:insert :index(%d) receive hello packet from index(%d). slotflag is:%d,%d,%d,%d,%d,%d,%d\n", CURRENT_TIME, index, id, nb->nb_slotCondition[0], nb->nb_slotCondition[1], nb->nb_slotCondition[2], nb->nb_slotCondition[3], nb->nb_slotCondition[4], nb->nb_slotCondition[5], nb->nb_slotCondition[6]);
-}
-
-void
-AODV::nb_insert(nsaddr_t id) {
-AODV_Neighbor *nb
 }
 
 AODV_Neighbor*
