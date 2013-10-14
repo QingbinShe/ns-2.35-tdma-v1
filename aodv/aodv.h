@@ -253,6 +253,9 @@ class AODV: public Agent {
         void            nb_delete(nsaddr_t id);
         void            nb_purge(void);
 
+	void		nb_free_tslot(int *slot);
+	void		nb_free_rslot(int *slot);
+
         /*
          * Broadcast ID Management
          */
@@ -270,7 +273,9 @@ class AODV: public Agent {
 
         void            sendReply(nsaddr_t ipdst, u_int32_t hop_count,
                                   nsaddr_t rpdst, u_int32_t rpseq,
-                                  u_int32_t lifetime, double timestamp);
+                                  u_int32_t lifetime, double timestamp,
+				//add by myself to record the slot's information
+                                  nsaddr_t packet_src, nsaddr_t packet_dst, int slot);
         void            sendError(Packet *p, bool jitter = true);
                                           
         /*

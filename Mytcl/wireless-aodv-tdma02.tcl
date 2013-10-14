@@ -55,8 +55,8 @@ $ns node-config -adhocRouting $val(rp) \
                 -phyType $val(netif) \
                 -channel $chan_1_ \
                 -topoInstance $topo \
-                -agentTrace OFF \
-                -routerTrace ON \
+                -agentTrace ON \
+                -routerTrace OFF \
                 -macTrace OFF \
                 -movementTrace OFF \
 		-phyTrace OFF
@@ -127,13 +127,13 @@ $ns initial_node_pos $n(4) 10
 #puts "opt(rate)=$opt(rate)"
 
 #建立数据流0从节点0到节点2
-set udp(0) [new Agent/UDP]              ;#建立数据发送代理
-$ns attach-agent $n(0) $udp(0)          ;#将数据发送代理绑定到节点0
-set null(0) [new Agent/Null]            ;#建立一个数据接收代理
-$ns attach-agent $n(2) $null(0)         ;#将数据接收代理绑定到节点2
-$ns connect $udp(0) $null(0)            ;#连接两个代理
-set cbr(0) [new Application/Traffic/CBR] ;#在UDP代理上建立CBR流
-$cbr(0) attach-agent $udp(0)
+#set udp(0) [new Agent/UDP]              ;#建立数据发送代理
+#$ns attach-agent $n(0) $udp(0)          ;#将数据发送代理绑定到节点0
+#set null(0) [new Agent/Null]            ;#建立一个数据接收代理
+#$ns attach-agent $n(2) $null(0)         ;#将数据接收代理绑定到节点2
+#$ns connect $udp(0) $null(0)            ;#连接两个代理
+#set cbr(0) [new Application/Traffic/CBR] ;#在UDP代理上建立CBR流
+#$cbr(0) attach-agent $udp(0)
 
 #建立数据流1从节点3到节点4
 set udp(1) [new Agent/UDP]
@@ -152,12 +152,13 @@ for {set i 0} {$i < $val(nn)} {incr i} {
     $rp($i) set-mac [$n($i) set mac_(0)]
 }
 
-$cbr(0) set rate_ $opt(rate)Kb          ;#设定数据流的数据速率
-$ns at 0.0 "$cbr(0) start"              ;#设定数据流的启动时间
-$ns at 10.0 "$cbr(0) stop"               ;#设定数据流的停止时间
+#程序中开始时间不要设置一样，会有rreq包冲突造成后面无法发送数据
+#$cbr(0) set rate_ $opt(rate)Kb          ;#设定数据流的数据速率
+#$ns at 2.0 "$cbr(0) start"              ;#设定数据流的启动时间
+#$ns at 10.0 "$cbr(0) stop"               ;#设定数据流的停止时间
 
 $cbr(1) set rate_ $opt(rate)Kb
-$ns at 0.0 "$cbr(1) start"
+$ns at 5.0 "$cbr(1) start"
 $ns at 10.0 "$cbr(1) stop"
 
 #

@@ -143,6 +143,9 @@ class aodv_rt_entry {
          * a list of neighbors that are using this route.
          */
         aodv_ncache          rt_nblist;
+
+	//to cash the free slot
+	int rt_temp_free_slot;
 };
 
 
@@ -152,11 +155,15 @@ class aodv_rt_entry {
 
 class aodv_rtable {
  public:
+	friend class Aodv;
 	aodv_rtable() { LIST_INIT(&rthead); }
 
         aodv_rt_entry*       head() { return rthead.lh_first; }
 
         aodv_rt_entry*       rt_add(nsaddr_t id);
+	//reconstruct
+	aodv_rt_entry*       rt_add(nsaddr_t id, int free_slot);
+
         void                 rt_delete(nsaddr_t id);
         aodv_rt_entry*       rt_lookup(nsaddr_t id);
 

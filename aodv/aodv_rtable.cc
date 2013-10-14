@@ -210,3 +210,17 @@ aodv_rt_entry *rt;
  LIST_INSERT_HEAD(&rthead, rt, rt_link);
  return rt;
 }
+
+aodv_rt_entry*
+aodv_rtable::rt_add(nsaddr_t id, int free_slot)
+{
+ aodv_rt_entry *rt;
+ 
+ assert(rt_lookup(id) == 0);
+ rt = new aodv_rt_entry;
+ assert(rt);
+ rt->rt_dst = id;
+ rt->rt_temp_free_slot = free_slot;
+ LIST_INSERT_HEAD(&rthead, rt, rt_link);
+ return rt;
+}
