@@ -694,6 +694,12 @@ void MacTdma::slotHandler(Event *e)
 {
 	struct hdr_cmn *ch;
 
+	//to test how to get the packet's src and dst addr
+	/*if (pktTx_) {
+		struct hdr_ip *ih = HDR_IP(pktTx_);
+		printf("\nindex(%d):src(%d) and dst(%d)\n", index_, ih->saddr(), ih->daddr());
+	}*/
+
 	//printf("slotHandler, the slot_count_(%d) of index_(%d)\n", slot_count_, index_);
 	mhSlot_.start((Packet *)e, slot_time_);
 
@@ -741,7 +747,8 @@ void MacTdma::slotHandler(Event *e)
 		//printf("slotHandler, index_(%d) go to the 2 if\n", index_);
 		if (pktTx_){
 			ch = HDR_CMN(pktTx_);
-			if (ch->ptype() != PT_AODV) {
+			struct hdr_ip *ih = HDR_IP(pktTx_);
+			if ((ch->ptype() != PT_AODV) && (ih->saddr() == slotTb_.slotTable[slot_count_].src) && (ih->daddr() == slotTb_.slotTable[slot_count_].dst)) {//to make sure the slot use to send its packet(not other packets)
 				send();
 			}
 			//printf("slotHandler, index_(%d) go to send\n", index_);

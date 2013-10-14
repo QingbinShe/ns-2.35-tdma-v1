@@ -128,21 +128,21 @@ $ns initial_node_pos $n(5) 10
 
 #建立数据流0从节点0到节点2
 set udp(0) [new Agent/UDP]              ;#建立数据发送代理
-$ns attach-agent $n(0) $udp(0)          ;#将数据发送代理绑定到节点0
+$ns attach-agent $n(1) $udp(0)          ;#将数据发送代理绑定到节点0
 set null(0) [new Agent/Null]            ;#建立一个数据接收代理
-$ns attach-agent $n(5) $null(0)         ;#将数据接收代理绑定到节点2
+$ns attach-agent $n(0) $null(0)         ;#将数据接收代理绑定到节点2
 $ns connect $udp(0) $null(0)            ;#连接两个代理
 set cbr(0) [new Application/Traffic/CBR] ;#在UDP代理上建立CBR流
 $cbr(0) attach-agent $udp(0)
 
 #建立数据流1从节点3到节点4
-#set udp(1) [new Agent/UDP]
-#ns attach-agent $n(3) $udp(1)
-#set null(1) [new Agent/Null]
-#$ns attach-agent $n(4) $null(1)
-#$ns connect $udp(1) $null(1)
-#set cbr(1) [new Application/Traffic/CBR]
-#$cbr(1) attach-agent $udp(1)
+set udp(1) [new Agent/UDP]
+$ns attach-agent $n(1) $udp(1)
+set null(1) [new Agent/Null]
+$ns attach-agent $n(2) $null(1)
+$ns connect $udp(1) $null(1)
+set cbr(1) [new Application/Traffic/CBR]
+$cbr(1) attach-agent $udp(1)
 
 for {set i 0} {$i < $val(nn)} {incr i} {
     $ns at $val(stop) "$n($i) reset"
@@ -157,9 +157,9 @@ $cbr(0) set rate_ $opt(rate)Kb          ;#设定数据流的数据速率
 $ns at 0.1 "$cbr(0) start"              ;#设定数据流的启动时间
 $ns at 20.0 "$cbr(0) stop"               ;#设定数据流的停止时间
 
-#$cbr(1) set rate_ $opt(rate)Kb
-#$ns at 6.0 "$cbr(1) start"
-#$ns at 20.0 "$cbr(1) stop"
+$cbr(1) set rate_ $opt(rate)Kb
+$ns at 7.0 "$cbr(1) start"
+$ns at 20.0 "$cbr(1) stop"
 
 #
 #======================结束模拟==============================
