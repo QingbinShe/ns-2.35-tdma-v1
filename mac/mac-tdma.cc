@@ -697,6 +697,17 @@ void MacTdma::slotHandler(Event *e)
 	//printf("slotHandler, the slot_count_(%d) of index_(%d)\n", slot_count_, index_);
 	mhSlot_.start((Packet *)e, slot_time_);
 
+	//check and update the slot table
+	for (int i = 0; i < max_slot_num_; i++) {
+		if ((slotTb_.slotTable[i].expire != -1) && (slotTb_.slotTable[i].expire <= Scheduler::instance().clock())) {
+			printf("\n%f:index(%d)'s slot(%d) timeout!\n", Scheduler::instance().clock(), index_, i);
+			slotTb_.slotTable[i].flag = 0;
+			slotTb_.slotTable[i].expire = -1;
+			slotTb_.slotTable[i].src = -1;
+			slotTb_.slotTable[i].dst = -1;
+		}
+	}
+
 	if (slot_count_ == FIRST_ROUND) {
 		slot_count_ = 0;
 		return;

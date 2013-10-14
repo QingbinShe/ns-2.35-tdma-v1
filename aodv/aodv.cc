@@ -867,6 +867,9 @@ rt_update(rt0, rq->rq_src_seqno, rq->rq_hop_count, ih->saddr(),
    seqno = max(seqno, rq->rq_dst_seqno)+1;
    if (seqno%2) seqno++;
 
+   //change the slot_table
+   macTdma->slotTb_.slotTable[free_slot].expire = CURRENT_TIME + TEST_ROUTE_TIMEOUT;
+
    sendReply(rq->rq_src,           // IP Destination
              1,                    // Hop Count
              index,                // Dest IP Address
@@ -1019,8 +1022,8 @@ if (ih->daddr() == index) { // If I am the original source
 
     //change slot_usage_table
     macTdma->slotTb_.slotTable[rp->rp_slot].flag = 1;
-    macTdma->slotTb_.slotTable[rp->rp_slot].src = rp->rp_dst;
-    macTdma->slotTb_.slotTable[rp->rp_slot].dst = rp->rp_src;
+    macTdma->slotTb_.slotTable[rp->rp_slot].src = rp->rp_packet_src;
+    macTdma->slotTb_.slotTable[rp->rp_slot].dst = rp->rp_packet_dst;
     macTdma->slotTb_.slotTable[rp->rp_slot].expire = CURRENT_TIME + TEST_ROUTE_TIMEOUT;
   	
 
@@ -1069,9 +1072,10 @@ aodv_rt_entry *rt0 = rtable.rt_lookup(ih->daddr());
 
    //change slot_usage_table
    macTdma->slotTb_.slotTable[rp->rp_slot].flag = 1;
-   macTdma->slotTb_.slotTable[rp->rp_slot].src = rp->rp_dst;
-   macTdma->slotTb_.slotTable[rp->rp_slot].dst = rp->rp_src;
+   macTdma->slotTb_.slotTable[rp->rp_slot].src = rp->rp_packet_src;
+   macTdma->slotTb_.slotTable[rp->rp_slot].dst = rp->rp_packet_dst;
    macTdma->slotTb_.slotTable[rp->rp_slot].expire = CURRENT_TIME + TEST_ROUTE_TIMEOUT;
+   macTdma->slotTb_.slotTable[rt0->rt_temp_free_slot].expire = CURRENT_TIME + TEST_ROUTE_TIMEOUT;
 
 //////////////////////////////////////////////////////////////////
 printf("\nrecvRREP:forward:index(%d)", index);
