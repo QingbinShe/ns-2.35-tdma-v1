@@ -166,7 +166,17 @@ void TxPktTdmaTimer::handle(Event *e)
 	
 	mac->sendHandler(e);
 }
+/* Delete table timer*/
+/*void SlotTableTimer::handle(Event *e)
+{
+	busy_ = 0;
+	paused_ = 0;
+	stime = 0.0;
+	rtime = 0.0;
 
+	mac->tableHandler(e);
+}
+*/
 /* ======================================================================
    TCL Hooks for the simulator
    ====================================================================== */
@@ -183,7 +193,7 @@ public:
 // Frame format:
 // Pamble Slot1 Slot2 Slot3...
 MacTdma::MacTdma(PHY_MIB* p) : 
-	Mac(), mhSlot_(this), mhTxPkt_(this), mhRxPkt_(this){
+	Mac(), mhSlot_(this), mhTxPkt_(this), mhRxPkt_(this)/*, mhTable_(this)*/{
 	/* Global variables setting. */
 	// Setup the phy specs.
 	phymib_ = p;
@@ -239,6 +249,8 @@ MacTdma::MacTdma(PHY_MIB* p) :
 
 	//Start the Slot timer..
 	mhSlot_.start((Packet *) (& intr_), 0);  
+	//start the table timer
+	//mhTable_.start((Packet *) (& intr_), 0);
 }
 
 /* similar to 802.11, no cached node lookup. */
@@ -663,6 +675,21 @@ void MacTdma::slotHandler(Event *e)
 	return;
 }
 */
+/*void MacTdma::tableHandler(Event *e)
+{
+	mhTable_.start((Packet *)e, slot_time_);
+	for (int i = 0; i < max_slot_num_; i++) {
+		if (slotTb_.slotTable[i].expire >= Scheduler::instance().clock()) {
+			slotTb_.slotTable[i].flag = 0;
+			slotTb_.slotTable[i].expire = -1;
+			slotTb_.slotTable[i].src = -1;
+			slotTb_.slotTable[i].dst = -1;
+		}
+	}
+	
+}
+*/
+
 void MacTdma::slotHandler(Event *e)
 {
 	struct hdr_cmn *ch;

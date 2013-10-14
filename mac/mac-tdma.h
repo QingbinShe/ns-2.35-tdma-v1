@@ -230,6 +230,13 @@ public:
 	void	handle(Event *e);
 };
 
+/*class SlotTableTimer : public MacTdmaTimer {
+public:
+	SlotTableTimer(MacTdma *m) : MacTdmaTimer(m) {}
+
+	void	handle(Event *e);
+};
+*/
 //the table to record node's every slot information
 struct slotToDst{
   int flag;            //mark the slot's usage status(1:sending, -1:receiving(not add now), 0:not used)
@@ -249,12 +256,14 @@ class MacTdma : public Mac {
   friend class SlotTdmaTimer;
   friend class TxPktTdmaTimer;
   friend class RxPktTdmaTimer;
+  //friend class SlotTableTimer;
 
   friend class SlotUsageTable;
 
  public:
 
-	SlotUsageTable slotTb_;
+  //the slto table which is used for slotHandler(important)
+  SlotUsageTable slotTb_;
 
   MacTdma(PHY_MIB* p);
   void		recv(Packet *p, Handler *h);
@@ -266,6 +275,7 @@ class MacTdma : public Mac {
   void slotHandler(Event *e);
   void recvHandler(Event *e);
   void sendHandler(Event *e);
+  //void tableHandler(Event *e);
   
  protected:
   PHY_MIB		*phymib_;
@@ -321,6 +331,7 @@ class MacTdma : public Mac {
   SlotTdmaTimer mhSlot_;
   TxPktTdmaTimer mhTxPkt_;
   RxPktTdmaTimer mhRxPkt_;
+ // SlotTableTimer mhTable_;
 
   //SlotUsageTable slotTb_;
 

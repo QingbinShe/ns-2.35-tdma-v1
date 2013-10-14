@@ -770,7 +770,13 @@ aodv_rt_entry *rt;
  macTdma->slotTb_.slotTable[free_slot].src = rq->rq_src;
  macTdma->slotTb_.slotTable[free_slot].dst = rq->rq_dst;
 
-
+/////////////////////////////////////////////////////
+printf("\nrecvRREQ:index(%d):", index);
+for (int i = 0; i < MAX_SLOT_NUM_; i++) {
+  printf("%d,", macTdma->slotTb_.slotTable[i].flag);
+}
+printf("\n\n");
+///////////////////////////////////////////////////
  /*
   * Cache the broadcast ID
   */
@@ -783,12 +789,16 @@ aodv_rt_entry *rt;
   * REPLY. Before we do anything, we make sure that the REVERSE
   * route is in the route table.
   */
- aodv_rt_entry *rt0; // rt0 is the reverse route 
+   aodv_rt_entry *rt0; // rt0 is the reverse route 
    
    rt0 = rtable.rt_lookup(rq->rq_src);
    if(rt0 == 0) { /* if not in the route table */
    // create an entry for the reverse route.
      //rt0 = rtable.rt_add(rq->rq_src);
+     rt0 = rtable.rt_add(rq->rq_src, free_slot);
+   }
+   else { /*because I need slot information, so I should change the information of reverse table*/
+     rtable.rt_delete(rq->rq_src);
      rt0 = rtable.rt_add(rq->rq_src, free_slot);
    }
    //test if the reverse has free_slot
@@ -1009,10 +1019,19 @@ if (ih->daddr() == index) { // If I am the original source
 
     //change slot_usage_table
     macTdma->slotTb_.slotTable[rp->rp_slot].flag = 1;
-    macTdma->slotTb_.slotTable[rp->rp_slot].src = rp->rp_src;
-    macTdma->slotTb_.slotTable[rp->rp_slot].dst = rp->rp_dst;
-    macTdma->slotTb_.slotTable[rp->rp_slot].expire = TEST_ROUTE_TIMEOUT;
-  }	
+    macTdma->slotTb_.slotTable[rp->rp_slot].src = rp->rp_dst;
+    macTdma->slotTb_.slotTable[rp->rp_slot].dst = rp->rp_src;
+    macTdma->slotTb_.slotTable[rp->rp_slot].expire = CURRENT_TIME + TEST_ROUTE_TIMEOUT;
+  	
+
+/////////////////////////////////////////////////////////////////////
+printf("\nrecvRREP:origin:index(%d):", index);
+for(int i = 0; i < MAX_SLOT_NUM_; i++) {
+  printf("%d,", macTdma->slotTb_.slotTable[i].flag);
+}
+printf("\n\n");
+///////////////////////////////////////////////////////////////////////
+}
 
   /*
    * Send all packets queued in the sendbuffer destined for
@@ -1050,9 +1069,17 @@ aodv_rt_entry *rt0 = rtable.rt_lookup(ih->daddr());
 
    //change slot_usage_table
    macTdma->slotTb_.slotTable[rp->rp_slot].flag = 1;
-   macTdma->slotTb_.slotTable[rp->rp_slot].src = rp->rp_src;
-   macTdma->slotTb_.slotTable[rp->rp_slot].dst = rp->rp_dst;
-   macTdma->slotTb_.slotTable[rp->rp_slot].expire = TEST_ROUTE_TIMEOUT;
+   macTdma->slotTb_.slotTable[rp->rp_slot].src = rp->rp_dst;
+   macTdma->slotTb_.slotTable[rp->rp_slot].dst = rp->rp_src;
+   macTdma->slotTb_.slotTable[rp->rp_slot].expire = CURRENT_TIME + TEST_ROUTE_TIMEOUT;
+
+//////////////////////////////////////////////////////////////////
+printf("\nrecvRREP:forward:index(%d)", index);
+for (int i = 0; i < MAX_SLOT_NUM_; i++) {
+  printf("%d,", macTdma->slotTb_.slotTable[i].flag);
+}
+printf("\n\n");
+////////////////////////////////////////////////////////////
 
    // If the rt is up, forward
    if(rt0 && (rt0->rt_hops != INFINITY2)) {
@@ -1362,6 +1389,20 @@ struct hdr_cmn *ch = HDR_CMN(p);
 struct hdr_ip *ih = HDR_IP(p);
 struct hdr_aodv_reply *rp = HDR_AODV_REPLY(p);
 aodv_rt_entry *rt = rtable.rt_lookup(ipdst);
+
+ //before send reply, I should change the information slot_usage_table
+ /*macTdma->slotTb_.slotTable[slot].flag = -1;
+ macTdma->slotTb_.slotTable[slot].expire = CURRENT_TIME + TEST_ROUTE_TIMEOUT;
+ macTdma->slotTb_.slotTable[slot].src = rpdst;
+ macTdma->slotTb_.slotTable[slot].dst = index;
+*/
+//test
+/*printf("\nindex(%d)'s slot_table:", index);
+for (int i = 0; i < MAX_SLOT_NUM_; i++) {
+  printf("%d,", macTdma->slotTb_.slotTable[i].flag);
+}
+printf("\n");
+*/
 
 #ifdef DEBUG
 fprintf(stderr, "sending Reply from %d at %.2f\n", index, Scheduler::instance().clock());
