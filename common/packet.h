@@ -598,6 +598,9 @@ enum ModulationScheme {BPSK = 0, QPSK = 1, QAM16 = 2, QAM64 = 3};
 
 struct hdr_cmn {
 
+	//to identify if the packet is Hello packet
+	int hello;
+
 	enum dir_t { DOWN= -1, NONE= 0, UP= 1 };
 	packet_t ptype_;	// packet type (see above)
 	int	size_;		// simulated packet size

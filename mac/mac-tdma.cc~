@@ -705,7 +705,7 @@ void MacTdma::slotHandler(Event *e)
 
 	//check and update the slot table
 	for (int i = 0; i < max_slot_num_; i++) {
-		if ((slotTb_.slotTable[i].expire != -1) && ((slotTb_.slotTable[i].expire) <= Scheduler::instance().clock())) {
+		if ((slotTb_.slotTable[i].expire != -1) && ((slotTb_.slotTable[i].expire / 2) <= Scheduler::instance().clock())) {
 			printf("\n%f:index(%d)'s slot(%d) timeout!\n", Scheduler::instance().clock(), index_, i);
 			slotTb_.slotTable[i].flag = 0;
 			slotTb_.slotTable[i].expire = -1;
@@ -719,13 +719,13 @@ void MacTdma::slotHandler(Event *e)
 		return;
 	}
 
-	/*use slot0 to send or receive hello, slot1 to send or receive rreq, rrep, error packet of AODV
+	/*use slot 0 to send or receive hello, rreq, rrep, error packet of AODV
 	*if slot_count_==0 and pktTx_'s type is aodv or arp, send. other time, the radio always keep ON to receive control packet.
 	*/
-	if (slot_count_ == 0) {
+	if ((slot_count_ == 0) || (slot_count_ == 1)) {
 		if (pktTx_) {
 			ch = HDR_CMN(pktTx_);
-			if ((ch->ptype() == PT_AODV) || (ch->ptype() == PT_ARP) && (ch->hello == 1)) {
+			if ((ch->ptype() == PT_AODV) || (ch->ptype() == PT_ARP)) {
 				//printf("%f:index(%d) send the packet(%d)\n", Scheduler::instance().clock(), index_, ch->ptype());
 				send();
 				slot_count_++;
@@ -741,28 +741,6 @@ void MacTdma::slotHandler(Event *e)
 		}
 		return;
 	}
-
-	if (slot_count_ == 1) {
-		if (pktTx_) {
-			ch = HDR_CMN(pktTx_);
-			if (((ch->ptype() == PT_AODV) || (ch->ptype() == PT_ARP)) && (ch->hello != 1)) {
-				//printf("%f:index(%d) send the packet(%d)\n", Scheduler::instance().clock(), index_, ch->ptype());
-				send();
-				slot_count_++;
-			}
-			else {
-				radioSwitch(ON);
-				slot_count_++;
-			}
-		}
-		else {
-			radioSwitch(ON);
-			slot_count_++;
-		}
-		return;
-	}
-
-
 
 	//if the slot of node is 'send'
 	if ((slot_count_ != 0) && (slot_count_ != 1) && (slotTb_.slotTable[slot_count_].flag == 1)) {

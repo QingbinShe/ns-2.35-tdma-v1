@@ -1,174 +1,219 @@
-Class TestSuite
+#
+#===============设置默认的参数val(*)===============================
+#
+set opt(rate)    30                    ;#默认的数据发送速率为30bit/s
+#proc getopt { } {                      ;#过程geiopt从命令行获取速率参数
+#    global opt
+#    set opt(rate) [lindex $argv 0]     
+#}
 
-#wireless model using aodv
-Class Test/aodv -superclass TestSuite
+set val(chan)    Channel/WirelessChannel      ;#物理信道类型：无线信道
+set val(prop)    Propagation/TwoRayGround     ;#无线传输模型：TwoRayGround
+set val(netif)   Phy/WirelessPhy              ;#网络接口类型：无线物理层
+set val(mac)     Mac/Tdma                     ;#MAC层：Tdma
+set val(ifq)     Queue/DropTail/PriQueue      ;#接口队列类型：IFQ队列
+set val(ll)      LL                           ;#逻辑链路层类型：LL层
+set val(ant)     Antenna/OmniAntenna          ;#天线模型：全向天线
+set val(ifqlen)  50                           ;#网络接口队列大小：50
+set val(rp)      AODV                         ;#无线路由协议：AODV
+set val(nn)      25                           ;#节点数目：9
+set val(x)       1000                         ;#仿真区域长度1000m
+set val(y)       1000                         ;#仿真区域宽度1000m
+set val(stop)    100.0                          ;#设定模拟时间1.0s
 
-proc usage { } {
-    global argv0
-    puts stderr "usage: ns $argv0 <tests>"
-    puts "Valid Tests: aodv"
-    exit 1
+set val(flow)    4				;#flow的数目
+#
+#==============启动实例和文件等===============================
+#
+#建立simulator实例
+set ns [new Simulator]
+
+#开启Trace文件和NAM显示文件
+set tracefd [open aodv-tdma.tr w]
+set namtrace [open aodv-tdma.nam w]
+$ns trace-all $tracefd
+$ns namtrace-all-wireless $namtrace $val(x) $val(y)
+
+#创建topology对象
+set topo [new Topography]
+$topo load_flatgrid $val(x) $val(y)
+
+#创建God
+create-god $val(nn)
+set chan_1_ [new $val(chan)]
+
+#
+#===============配置无线节点===================================
+#
+#无线节点配置
+$ns node-config -adhocRouting $val(rp) \
+                -llType $val(ll) \
+                -macType $val(mac) \
+                -ifqType $val(ifq) \
+                -ifqLen $val(ifqlen) \
+                -antType $val(ant) \
+                -propType $val(prop) \
+                -phyType $val(netif) \
+                -channel $chan_1_ \
+                -topoInstance $topo \
+                -agentTrace ON \
+                -routerTrace ON \
+                -macTrace OFF \
+                -movementTrace OFF \
+		-phyTrace OFF
+
+#定义节点的slot数目
+Mac/Tdma set max_slot_num_ 7
+
+#建立节点的位置
+set i 0				;#节点数目
+while {$i < 5} {		;#第一列
+	set n($i) [$ns node]
+	$n($i) set X_ 50
+	$n($i) set Y_ [expr 50+200*$i]
+	$n($i) set Z_ 0.0
+	$ns initial_node_pos $n($i) 10
+	
+	incr i
 }
 
-proc default_options { } {
-    global opt
-    set opt(chan)  Channel/WirelessChannel
-    set opt(prop)  Propagation/FreeSpace ;#the propagation is ideal model
-    set opt(netif) Phy/WirelessPhy
-    set opt(mac)   Mac/Tdma
-    set opt(ifq)   Queue/DropTail/PriQueue ;#queue model
-    set opt(ll)    LL
-    set opt(ant)   Antenna/OmniAntenna
-    set opt(x)     670 ;#x dimension of the topography
-    set opt(y)     670 ;#y dimension of the topography
-    set opt(ifqlen) 50 ;#max packet in ifq
-    set opt(seed)  0.0
-    set opt(tr)    temp.rands ;#trace file
-    set opt(lm)    "off" ;#log movement
-    set opt(energy) EnergyModel ;#energymodel
+while {$i < 10} {
+	set n($i) [$ns node]
+	$n($i) set X_ 250
+	$n($i) set Y_ [expr 50+200*($i-5)]
+	$n($i) set Z_ 0.0
+	$ns initial_node_pos $n($i) 10
+	
+	incr i
+}
+
+while {$i < 15} {
+	set n($i) [$ns node]
+	$n($i) set X_ 450
+	$n($i) set Y_ [expr 50+200*($i-10)]
+	$n($i) set Z_ 0.0
+	$ns initial_node_pos $n($i) 10
+	
+	incr i
+}
+
+while {$i < 20} {
+	set n($i) [$ns node]
+	$n($i) set X_ 650
+	$n($i) set Y_ [expr 50+200*($i-15)]
+	$n($i) set Z_ 0.0
+	$ns initial_node_pos $n($i) 10
+	
+	incr i
+}
+
+while {$i < 25} {
+	set n($i) [$ns node]
+	$n($i) set X_ 850
+	$n($i) set Y_ [expr 50+200*($i-20)]
+	$n($i) set Z_ 0.0
+	$ns initial_node_pos $n($i) 10
+	
+	incr i
 }
 
 
-#======================================================
-#Other default settings
+#=====================设置数据流==================================
+#
+#建立数据流0从节点0到节点2
+#set udp(10) [new Agent/UDP]              ;#建立数据发送代理
+#$ns attach-agent $n(23) $udp(10)          ;#将数据发送代理绑定到节点0
+#set null(10) [new Agent/Null]            ;#建立一个数据接收代理
+#$ns attach-agent $n(24) $null(10)         ;#将数据接收代理绑定到节点2
+#$ns connect $udp(10) $null(10)            ;#连接两个代理
+#set cbr(10) [new Application/Traffic/CBR] ;#在UDP代理上建立CBR流
+#$cbr(10) attach-agent $udp(10)
 
-set AgentTrace    ON
-set RouterTrace   OFF
-set MacTrace      OFF
+#获得随机数
+proc RandomRange {min max} {
+    #获得[0.0  1.0]之间的随机数
+    set rd [expr rand()]
 
-#Mac/Tdma set slot_packet_len_ 512
-#Mac/Tdma set max_node_num_ 50
-
-LL set mindelay_ 50us
-LL set delay_ 25us
-LL set bandwidth_ 0 ;#not used
-
-Agent/Null set sport_ 0
-Agent/Null set dport_ 0
-Agent/CBR set sport_ 0
-Agent/CBR set dport_ 0
-
-Queue/DropTail/PriQueue set Prefer_Routing_Protocols 1
-
-#unity gain, omni-directional antennas
-#set up the antennas to be centered in the node and 1.5 meters above it
-Antenna/OmniAntenna set X_ 0
-Antenna/OmniAntenna set Y_ 0
-Antenna/OmniAntenna set Z_ 1.5
-Antenna/OmniAntenna set Gt_ 1.0
-Antenna/OmniAntenna set Gr_ 1.0
-
-#Initialize the ShareMedia interface with parameters to make
-#it work like the 914MHz Lucent WaveLAN DSSS radio interface
-Phy/WirelessPhy set CPThresh_ 10.0
-Phy/WirelessPhy set CSThresh_ 1.559e-11
-Phy/WirelessPhy set RXThresh_ 3.652e-10
-Phy/WirelessPhy set Rb_ 2*1e6
-Phy/WirelessPhy set Pt_ 0.28183815
-Phy/WirelessPhy set freq_ 914e+6
-Phy/WirelessPhy set L_ 1.0
-
-#======================================================
-
-TestSuite instproc init { } {
-    global opt tracefd topo chan prop
-    global node_ god_
-    $self instvar ns_ testName_
-    set ns_  [new Simulator]
-    if { string compare $testName_ "aodv" } {
-        $ns_ set-address-format hierarchical
-        AddrParams set domain_num_ 3
-        lappend cluster_num 2 1 1
-        AddrParams set cluster_num_ $cluster_num
-        lappend eilastlevel 1 1 4 1
-        AddrParams set nodes_num_ $eilastlevel
-    }
-    set topo [new Topography]
-    set tracefd [open $opt(tr) w]
-
-    $topo load_flatgrid $opt(x) $opt(y)
-    $ns_ trace-all $tracefd
-
-    #create God
-    $self create-god $opt(nn)
-
-    #log the mobile nodes movements if desired
-    if { $opt(lm) == "on" } {
-        $self log-movement
-    }
+    #将$rd放大到[$min $max]
+    set result [expr $rd*($max-$min)+$min]
     
-    puts $tracefd "M 0.0 nn:$opt(nn) x:$opt(x) y:$opt(y) rp:$opt(rp)"
-    puts $tracefd "M 0.0 sc:$opt(sc) cp:$opt(cp) seed:$opt(seed)"
-    puts $tracefd "M 0.0 prop:$opt(prop) ant:$opt(ant)"
+    return $result
+}
+#获得整数型随机数
+proc RandomRangeInt {min max} {
+    return [expr int([RandomRange $min $max])]
 }
 
-Test/aodv instproc init { } {
-    global opt node_ god_ chan topo
-    $self instvar ns_ testName_
-    set testName_ aodv
-    set opt(rp) aodv
-    set opt(cp) "../mobility/scene/cbr-50-20-4-512"
-    set opt(sc) "../mobility/scene/scen-670x670-50-600-20-0"
-    set opt(nn) 50
-    set opt(stop) 1000.0
+#设置数据流
+for {set i 0} {$i < $val(flow)} {incr i} {
+    set node0 [RandomRangeInt 0 24]
+    set node1 [RandomRangeInt 0 24]
 
-    $self next
-
-    #create God
-    set god_ [create-god $opt(nn)]
-
-    $ns_ node-config -adhocRouting AODV \
-            -llType $opt(ll) \
-            -macType $opt(mac) \
-            -ifqType $opt(ifq) \
-            -ifqLen $opt(ifqlen) \
-            -antType $opt(ant) \
-            -propType $opt(prop) \
-            -phyType $opt(netif) \
-            -channel [new $opt(chan)] \
-            -topoInstance $topo \
-            -agentTrace ON \
-            -routerTrace ON \
-            -macTrace OFF \
-            -toraDebug OFF \
-            -movementTrace OFF
-
-    for {set i 0} {$i < $opt(nn)} {incr i} {
-        set node_($i) [$ns_ node]
-        $node_($i) random-motion 0
+    while {$node0 == $node1} {
+        set node0 [RandomRangeInt 0 24]
+        set node1 [RandomRangeInt 0 24]
     }
 
-    puts "Loading connection pattern..."
-    source $opt(cp)
+puts "$i $node0 $node1"
 
-    puts "Loading scenario file..."
-    source $opt(sc)
-    puts "Load complete..."
+    set udp($i) [new Agent/UDP]
+    $ns attach-agent $n($node0) $udp($i)
+    set null($i) [new Agent/Null]
+    $ns attach-agent $n($node1) $null($i)
+    $ns connect $udp($i) $null($i)
+    set cbr($i) [new Application/Traffic/CBR]
+    $cbr($i) attach-agent $udp($i)
 
-    $ns_ at $opt(stop) "puts \"NS EXITING...\";"
-    $ns_ at $opt(stop).1 "$self finish-aodv"
 }
 
-Test/aodv instproc run { } {
-    $self instvar ns_
-    puts "Starting Simulation..."
-    $ns_ run
+
+for {set i 0} {$i < $val(nn)} {incr i} {
+    $ns at $val(stop) "$n($i) reset"
+
+    #让aodv能够访问tdma
+    set rp($i) [$n($i) agent 255]
+    $rp($i) set-mac [$n($i) set mac_(0)]
 }
 
-TestSuite instproc finish-aodv { } {
-    $self instvar ns_
-    global quiet opt tracefd
-    $ns_ flush-trace
+#程序中开始时间不要设置一样，会有rreq包冲突造成后面无法发送数据
+#$cbr(10) set rate_ $opt(rate)Kb          ;#设定数据流的数据速率
+#$ns at 1.0 "$cbr(10) start"              ;#设定数据流的启动时间
+#$ns at 20.0 "$cbr(10) stop"               ;#设定数据流的停止时间
+
+#设置数据流开始结束时间
+for {set i 0} {$i < $val(flow)} {incr i} {
+    $cbr($i) set rate_ $opt(rate)Kb
+
+    set time0 [RandomRange 0 $val(stop)]
+    set time1 [RandomRange 0 $val(stop)]
+
+    #因为在aodv中，对slot的清除最大设置为50s且time0要比time1小
+    while {$time0 >= $time1 || [expr $time1 - $time0] > 50} {
+        set time0 [RandomRange 0 $val(stop)]
+        set time1 [RandomRange 0 $val(stop)]
+    }
+
+puts "$time0 $time1"
+
+    $ns at $time0 "$cbr($i) start"
+    $ns at $time1 "$cbr($i) stop"
+}
+
+#
+#======================结束模拟==============================
+#
+#结束过程，关闭trace文件和nam文件
+proc finish { } {
+    global ns tracefd namtrace
+    $ns flush-trace
     close $tracefd
-    puts "finish..."
+    close $namtrace
     exit 0
 }
 
-TestSuite instproc finish { } {
-    $self instvar ns_
-    global quiet
+$ns at $val(stop) "finish"
+$ns at $val(stop) "puts \"NS EXISTING...\"; $ns hait"
 
-    $ns_ flush-trace
-    puts "finishing.."
-    exit 0
-}
+puts "Start Simulation..."
+
+$ns run

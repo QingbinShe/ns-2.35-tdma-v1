@@ -467,7 +467,7 @@ aodv_rt_entry *rt;
   */
  ch->xmit_failure_ = aodv_rt_failed_callback;
  ch->xmit_failure_data_ = (void*) this;
-	rt = rtable.rt_lookup(ih->daddr());
+ rt = rtable.rt_lookup(ih->daddr());
  if(rt == 0) {
 	  rt = rtable.rt_add(ih->daddr());
  }
@@ -483,7 +483,7 @@ aodv_rt_entry *rt;
  /*
   *  if I am the source of the packet, then do a Route Request.
   */
-	else if(ih->saddr() == index) {
+ else if(ih->saddr() == index) {
    rqueue.enque(p);
    sendRequest(rt->rt_dst);
  }
@@ -771,7 +771,7 @@ aodv_rt_entry *rt;
  macTdma->slotTb_.slotTable[free_slot].dst = rq->rq_dst;
 
 /////////////////////////////////////////////////////
-printf("\nrecvRREQ:index(%d):", index);
+printf("\n%f:recvRREQ:index(%d):", CURRENT_TIME, index);
 for (int i = 0; i < MAX_SLOT_NUM_; i++) {
   printf("%d,", macTdma->slotTb_.slotTable[i].flag);
 }
@@ -1028,7 +1028,7 @@ if (ih->daddr() == index) { // If I am the original source
   	
 
 /////////////////////////////////////////////////////////////////////
-printf("\nrecvRREP:origin:index(%d):", index);
+printf("\n%f:recvRREP:origin:index(%d):", CURRENT_TIME, index);
 for(int i = 0; i < MAX_SLOT_NUM_; i++) {
   printf("%d,", macTdma->slotTb_.slotTable[i].flag);
 }
@@ -1070,7 +1070,8 @@ if(ih->daddr() == index || suppress_reply) {
  // Find the rt entry
 aodv_rt_entry *rt0 = rtable.rt_lookup(ih->daddr());
 
-   //change slot_usage_table
+///////////////////////////////////////////////////////////////////////////////////////////////
+/*   //change slot_usage_table
    macTdma->slotTb_.slotTable[rp->rp_slot].flag = 1;
    macTdma->slotTb_.slotTable[rp->rp_slot].src = rp->rp_packet_src;
    macTdma->slotTb_.slotTable[rp->rp_slot].dst = rp->rp_packet_dst;
@@ -1078,16 +1079,33 @@ aodv_rt_entry *rt0 = rtable.rt_lookup(ih->daddr());
    macTdma->slotTb_.slotTable[rt0->rt_temp_free_slot].expire = CURRENT_TIME + TEST_ROUTE_TIMEOUT;
 
 //////////////////////////////////////////////////////////////////
-printf("\nrecvRREP:forward:index(%d)", index);
+printf("\n%f:recvRREP:forward:index(%d)", CURRENT_TIME, index);
 for (int i = 0; i < MAX_SLOT_NUM_; i++) {
   printf("%d,", macTdma->slotTb_.slotTable[i].flag);
 }
 printf("\n\n");
 ////////////////////////////////////////////////////////////
-
+*/
+///////////////////////////////////////////////////////////////////////////////////////////////
    // If the rt is up, forward
    if(rt0 && (rt0->rt_hops != INFINITY2)) {
-        assert (rt0->rt_flags == RTF_UP);
+
+//change slot_usage_table
+   macTdma->slotTb_.slotTable[rp->rp_slot].flag = 1;
+   macTdma->slotTb_.slotTable[rp->rp_slot].src = rp->rp_packet_src;
+   macTdma->slotTb_.slotTable[rp->rp_slot].dst = rp->rp_packet_dst;
+   macTdma->slotTb_.slotTable[rp->rp_slot].expire = CURRENT_TIME + TEST_ROUTE_TIMEOUT;
+   macTdma->slotTb_.slotTable[rt0->rt_temp_free_slot].expire = CURRENT_TIME + TEST_ROUTE_TIMEOUT;
+
+//////////////////////////////////////////////////////////////////
+printf("\n%f:recvRREP:forward:index(%d)", CURRENT_TIME, index);
+for (int i = 0; i < MAX_SLOT_NUM_; i++) {
+  printf("%d,", macTdma->slotTb_.slotTable[i].flag);
+}
+printf("\n\n");
+////////////////////////////////////////////////////////////////////
+
+     assert (rt0->rt_flags == RTF_UP);
      rp->rp_hop_count += 1;
      rp->rp_src = index;
 
@@ -1381,6 +1399,13 @@ aodv_rt_entry *rt = rtable.rt_lookup(dst);
  }
  printf("\n"); 
 */
+/////////////////////////////////////////////////////////////////////
+printf("\n%f:recvRREP:origin:index(%d):", CURRENT_TIME, index);
+for(int i = 0; i < MAX_SLOT_NUM_; i++) {
+  printf("%d,", macTdma->slotTb_.slotTable[i].flag);
+}
+printf("\n\n");
+///////////////////////////////////////////////////////////////////////
  Scheduler::instance().schedule(target_, p, 0.);
 }
 
@@ -1442,6 +1467,14 @@ fprintf(stderr, "sending Reply from %d at %.2f\n", index, Scheduler::instance().
  ih->sport() = RT_PORT;
  ih->dport() = RT_PORT;
  ih->ttl_ = NETWORK_DIAMETER;
+
+/////////////////////////////////////////////////////////////////////
+printf("\n%f:recvRREP:origin:index(%d):", CURRENT_TIME, index);
+for(int i = 0; i < MAX_SLOT_NUM_; i++) {
+  printf("%d,", macTdma->slotTb_.slotTable[i].flag);
+}
+printf("\n\n");
+///////////////////////////////////////////////////////////////////////
 
  Scheduler::instance().schedule(target_, p, 0.);
 
@@ -1524,6 +1557,8 @@ fprintf(stderr, "sending Hello from %d at %.2f\n", index, Scheduler::instance().
  ch->error() = 0;
  ch->addr_type() = NS_AF_NONE;
  ch->prev_hop_ = index;          // AODV hack
+
+ ch->hello = 1;
 
  ih->saddr() = index;
  ih->daddr() = IP_BROADCAST;
