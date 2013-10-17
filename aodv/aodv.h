@@ -122,7 +122,7 @@ class AODV;
 #define ARP_DELAY 0.01      // fixed delay to keep arp happy
 
 
-#define HELLO_INTERVAL          1               // 1000 ms
+#define HELLO_INTERVAL          3               // 1000 ms
 #define ALLOWED_HELLO_LOSS      3               // packets
 #define BAD_LINK_LIFETIME       3               // 3000 ms
 #define MaxHelloInterval        (1.25 * HELLO_INTERVAL)

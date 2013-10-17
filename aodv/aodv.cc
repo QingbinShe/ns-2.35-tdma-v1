@@ -1406,7 +1406,8 @@ for(int i = 0; i < MAX_SLOT_NUM_; i++) {
 }
 printf("\n\n");
 ///////////////////////////////////////////////////////////////////////
- Scheduler::instance().schedule(target_, p, 0.);
+ 
+ Scheduler::instance().schedule(target_, p, 0.006*MAX_SLOT_NUM_*(0.5+Random::uniform()));
 }
 
 void
@@ -1476,7 +1477,7 @@ for(int i = 0; i < MAX_SLOT_NUM_; i++) {
 printf("\n\n");
 ///////////////////////////////////////////////////////////////////////
 
- Scheduler::instance().schedule(target_, p, 0.);
+ Scheduler::instance().schedule(target_, p, 0.006*MAX_SLOT_NUM_*(0.5+Random::uniform()));
 
 }
 

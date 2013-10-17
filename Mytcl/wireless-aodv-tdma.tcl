@@ -21,7 +21,7 @@ set val(x)       1000                         ;#仿真区域长度1000m
 set val(y)       1000                         ;#仿真区域宽度1000m
 set val(stop)    100.0                          ;#设定模拟时间1.0s
 
-set val(flow)    4				;#flow的数目
+set val(flow)    10				;#flow的数目
 #
 #==============启动实例和文件等===============================
 #
@@ -60,7 +60,6 @@ $ns node-config -adhocRouting $val(rp) \
                 -routerTrace ON \
                 -macTrace OFF \
                 -movementTrace OFF \
-		-phyTrace OFF
 
 #定义节点的slot数目
 Mac/Tdma set max_slot_num_ 7

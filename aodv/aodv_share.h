@@ -8,7 +8,7 @@
 //how many slot used to send control packet
 #define SLOT_AS_CONTROL		2
 
-#define TEST_ROUTE_TIMEOUT	100    //in mac-tdma.cc, I use "expire/2" to let the useless slot be clean more quickly, but if the node receive rrep, it's slot is usefull, so this timeout should be 50*3
+#define TEST_ROUTE_TIMEOUT	150    //in mac-tdma.cc, I use "expire/2" to let the useless slot be clean more quickly, but if the node receive rrep, it's slot is usefull, so this timeout should be 50*3
 
 
 /*struct Slot {
