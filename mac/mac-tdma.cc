@@ -725,7 +725,7 @@ void MacTdma::slotHandler(Event *e)
 	if (slot_count_ == 0) {
 		if (pktTx_) {
 			ch = HDR_CMN(pktTx_);
-			if (((ch->ptype() == PT_AODV) || (ch->ptype() == PT_ARP)) /*&& (ch->hello == 1)*/) {
+			if (((ch->ptype() == PT_AODV) || (ch->ptype() == PT_ARP)) && (ch->hello == 1)) {
 				//printf("%f:index(%d) send the packet(%d)\n", Scheduler::instance().clock(), index_, ch->ptype());
 				send();
 				slot_count_++;
@@ -745,7 +745,7 @@ void MacTdma::slotHandler(Event *e)
 	if (slot_count_ == 1) {
 		if (pktTx_) {
 			ch = HDR_CMN(pktTx_);
-			if (((ch->ptype() == PT_AODV) || (ch->ptype() == PT_ARP)) /*&& (ch->hello != 1)*/) {
+			if (((ch->ptype() == PT_AODV) || (ch->ptype() == PT_ARP)) && (ch->hello != 1)) {
 				//printf("%f:index(%d) send the packet(%d)\n", Scheduler::instance().clock(), index_, ch->ptype());
 				send();
 				slot_count_++;

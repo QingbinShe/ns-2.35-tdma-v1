@@ -737,6 +737,7 @@ aodv_rt_entry *rt;
      }*/
  }
  nb_free_rslot(temp_free_slot);
+//nb_free_rsloto(temp_free_slot);
 
  //calculate the free time slot of the path
  for (int i = SLOT_AS_CONTROL; i < MAX_SLOT_NUM_; i++) {
@@ -945,6 +946,7 @@ rt_update(rt0, rq->rq_src_seqno, rq->rq_hop_count, ih->saddr(),
      }*/
    }
    nb_free_tslot(rq->rq_free_slot);
+//   nb_free_tsloto(rq->rq_free_slot);
    //test the sendrreq
    /*printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
    printf("\n%f:index(%d) send rreq:\n", CURRENT_TIME, index);
@@ -973,6 +975,12 @@ double delay = 0.0;
 #ifdef DEBUG
  fprintf(stderr, "%d - %s: received a REPLY\n", index, __FUNCTION__);
 #endif // DEBUG
+
+//if the slot that reply has is not free, drop
+if (macTdma->slotTb_.slotTable[rp->rp_slot].flag != 0) {
+	Packet::free(p);
+	return;
+}
 
 
  /*
@@ -1390,6 +1398,7 @@ aodv_rt_entry *rt = rtable.rt_lookup(dst);
    }*/
  }
  nb_free_tslot(rq->rq_free_slot);
+// nb_free_tsloto(rq->rq_free_slot);
 
  //test sendrreq
  /*printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
@@ -1710,7 +1719,17 @@ AODV::nb_free_tslot(int *slot) {
 		}
 	}
 }
-
+void
+AODV::nb_free_tsloto(int *slot) {
+	AODV_Neighbor *nb = nbhead.lh_first;
+	for (int i = SLOT_AS_CONTROL; i < MAX_SLOT_NUM_; i++) {
+		for(; nb; nb = nb->nb_link.le_next) {
+			if (nb->nb_slotCondition[i] != 0) {
+				slot[i] = 1;
+			}
+		}
+	}
+}
 //calculate the free receiving slot
 void
 AODV::nb_free_rslot(int *slot) {
@@ -1723,4 +1742,14 @@ AODV::nb_free_rslot(int *slot) {
 		}
 	}
 }
-
+void
+AODV::nb_free_rsloto(int *slot) {
+	AODV_Neighbor *nb = nbhead.lh_first;
+	for (int i = SLOT_AS_CONTROL; i <MAX_SLOT_NUM_; i++) {
+		for (; nb; nb = nb->nb_link.le_next) {
+			if (nb->nb_slotCondition[i] != 0) {
+				slot[i] = 1;
+			}
+		}
+	}
+}

@@ -1,11 +1,13 @@
 #
 #===============设置默认的参数val(*)===============================
 #
-set opt(rate)    30                    ;#默认的数据发送速率为30bit/s
-#proc getopt { } {                      ;#过程geiopt从命令行获取速率参数
-#    global opt
-#    set opt(rate) [lindex $argv 0]     
-#}
+set opt(rate)	20                    ;#默认的数据发送速率为30bit/s
+
+set opt(flow)	0			;#flow个数
+proc getopt {argc argv} {                      ;#过程geiopt从命令行获取速率参数
+    global opt
+    set opt(flow) [lindex $argv 0]     
+}
 
 set val(chan)    Channel/WirelessChannel      ;#物理信道类型：无线信道
 set val(prop)    Propagation/TwoRayGround     ;#无线传输模型：TwoRayGround
@@ -21,7 +23,6 @@ set val(x)       1000                         ;#仿真区域长度1000m
 set val(y)       1000                         ;#仿真区域宽度1000m
 set val(stop)    100.0                          ;#设定模拟时间1.0s
 
-set val(flow)    10				;#flow的数目
 #
 #==============启动实例和文件等===============================
 #
@@ -57,12 +58,12 @@ $ns node-config -adhocRouting $val(rp) \
                 -channel $chan_1_ \
                 -topoInstance $topo \
                 -agentTrace ON \
-                -routerTrace ON \
+                -routerTrace OFF \
                 -macTrace OFF \
                 -movementTrace OFF \
 
 #定义节点的slot数目
-Mac/Tdma set max_slot_num_ 7
+Mac/Tdma set max_slot_num_ 5
 
 #建立节点的位置
 set i 0				;#节点数目
@@ -121,12 +122,16 @@ while {$i < 25} {
 #
 #建立数据流0从节点0到节点2
 #set udp(10) [new Agent/UDP]              ;#建立数据发送代理
-#$ns attach-agent $n(23) $udp(10)          ;#将数据发送代理绑定到节点0
+#$ns attach-agent $n(0) $udp(10)          ;#将数据发送代理绑定到节点0
 #set null(10) [new Agent/Null]            ;#建立一个数据接收代理
 #$ns attach-agent $n(24) $null(10)         ;#将数据接收代理绑定到节点2
 #$ns connect $udp(10) $null(10)            ;#连接两个代理
 #set cbr(10) [new Application/Traffic/CBR] ;#在UDP代理上建立CBR流
 #$cbr(10) attach-agent $udp(10)
+
+#获得数据流个数
+getopt $argc $argv
+puts "opt(flow)=$opt(flow)"
 
 #获得随机数
 proc RandomRange {min max} {
@@ -144,7 +149,7 @@ proc RandomRangeInt {min max} {
 }
 
 #设置数据流
-for {set i 0} {$i < $val(flow)} {incr i} {
+for {set i 0} {$i < $opt(flow)} {incr i} {
     set node0 [RandomRangeInt 0 24]
     set node1 [RandomRangeInt 0 24]
 
@@ -162,7 +167,6 @@ puts "$i $node0 $node1"
     $ns connect $udp($i) $null($i)
     set cbr($i) [new Application/Traffic/CBR]
     $cbr($i) attach-agent $udp($i)
-
 }
 
 
@@ -180,7 +184,7 @@ for {set i 0} {$i < $val(nn)} {incr i} {
 #$ns at 20.0 "$cbr(10) stop"               ;#设定数据流的停止时间
 
 #设置数据流开始结束时间
-for {set i 0} {$i < $val(flow)} {incr i} {
+for {set i 0} {$i < $opt(flow)} {incr i} {
     $cbr($i) set rate_ $opt(rate)Kb
 
     set time0 [RandomRange 0 $val(stop)]

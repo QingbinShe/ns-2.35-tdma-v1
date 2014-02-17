@@ -81,7 +81,7 @@ class AODV;
 
 #define MY_ROUTE_TIMEOUT        10                      	// 100 seconds
 #define ACTIVE_ROUTE_TIMEOUT    10				// 50 seconds
-#define REV_ROUTE_LIFE          6				// 5  seconds
+#define REV_ROUTE_LIFE          4				// 5  seconds
 #define BCAST_ID_SAVE           6				// 3 seconds
 
 
@@ -122,7 +122,7 @@ class AODV;
 #define ARP_DELAY 0.01      // fixed delay to keep arp happy
 
 
-#define HELLO_INTERVAL          3               // 1000 ms
+#define HELLO_INTERVAL          1               // 1000 ms
 #define ALLOWED_HELLO_LOSS      3               // packets
 #define BAD_LINK_LIFETIME       3               // 3000 ms
 #define MaxHelloInterval        (1.25 * HELLO_INTERVAL)
@@ -255,6 +255,9 @@ class AODV: public Agent {
 
 	void		nb_free_tslot(int *slot);
 	void		nb_free_rslot(int *slot);
+
+	void		nb_free_tsloto(int *slot);
+	void		nb_free_rsloto(int *slot);
 
         /*
          * Broadcast ID Management
