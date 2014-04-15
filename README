@@ -42,3 +42,8 @@ LATEST INFORMATION:
 If you find ns useful, you may also wish to look at nam, the network
 animator <http://www.isi.edu/nsnam/nam>.
 
+What kind of job do I do:
+Rewrite the mac-tdma.cc: In tdma, let node send data by following the time slot table; instead of
+                         assigning one slot to every node.
+Rewrite the aodv.cc: Let aodv can visit mac-tdma and assign time slot in route discovery process.
+                     But each link can just assign one slot.
